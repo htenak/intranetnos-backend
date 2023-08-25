@@ -12,7 +12,11 @@ import {
 } from './config/constants';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
-import { PersonModule } from './person/person.module';
+import { AcademicModule } from './academic/academic.module';
+import { ClassModule } from './class/class.module';
+import { GradeModule } from './grade/grade.module';
+import { ActivityModule } from './activity/activity.module';
+import { ScheduleModule } from './schedule/schedule.module';
 
 @Module({
   imports: [
@@ -32,7 +36,11 @@ import { PersonModule } from './person/person.module';
     ConfigModule.forRoot({ isGlobal: true, envFilePath: '.env' }),
     UserModule,
     AuthModule,
-    PersonModule,
+    AcademicModule,
+    ClassModule,
+    GradeModule,
+    ActivityModule,
+    ScheduleModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -5,3 +5,9 @@ export const DB_USER = 'DB_USER';
 export const DB_PASS = 'DB_PASS';
 export const DB_NAME = 'DB_NAME';
 export const JWT_SECRET = 'JWT_SECRET';
+export const ROLE = {
+  user: 'user',
+  student: 'student',
+  professor: 'professor',
+  admin: 'admin',
+};
