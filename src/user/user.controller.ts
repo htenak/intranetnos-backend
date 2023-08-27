@@ -175,4 +175,6 @@ export class UserController {
     const filePath = join(__dirname, '..', '..', 'uploads', fileName);
     return res.sendFile(filePath);
   }
+
+  // eliminar mi foto
 }
