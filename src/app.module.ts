@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import {
@@ -32,6 +34,10 @@ import { ScheduleModule } from './schedule/schedule.module';
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
         synchronize: true, //desactivar en producción
       }),
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'uploads'),
+      serveRoot: '/avatars',
     }),
     ConfigModule.forRoot({ isGlobal: true, envFilePath: '.env' }),
     UserModule,
