@@ -44,7 +44,7 @@ export class User {
   password: string;
 
   @Column({ type: 'varchar', nullable: true })
-  photo: string;
+  filename: string;
 
   @Column({ name: 'role_id', nullable: false })
   roleId: number;

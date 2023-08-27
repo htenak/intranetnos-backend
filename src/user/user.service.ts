@@ -2,7 +2,6 @@ import {
   BadRequestException,
   ConflictException,
   HttpException,
-  Inject,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -10,8 +9,12 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Role, User } from './entities';
-import { hash } from 'bcryptjs';
-import { CreateUserDto, UpdateUserDto } from './dto';
+import {
+  CreateUserDto,
+  UpdateMyUserDto,
+  UpdateUserDto,
+  UploadMyPhotoDto,
+} from './dto';
 
 @Injectable()
 export class UserService {
@@ -65,6 +68,18 @@ export class UserService {
     }
   }
 
+  // obtiene role por nombre
+  async getRoleByName(name: string) {
+    try {
+      const roleFound = await this.roleRepository.findOneBy({ name });
+      if (!roleFound) throw new NotFoundException('El rol no existe');
+      return roleFound;
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      throw new InternalServerErrorException('¡Ups! Error interno');
+    }
+  }
+
   // obtiene todos o segun status (admin)
   async getUsersByStatus(status: string) {
     try {
@@ -109,7 +124,7 @@ export class UserService {
         where: { id },
         relations: ['role'],
       });
-      if (!person) throw new NotFoundException('La persona no existe');
+      if (!person) throw new NotFoundException('Usuario no encontrado');
       return person;
     } catch (error) {
       if (error instanceof HttpException) throw error;
@@ -171,7 +186,6 @@ export class UserService {
         const newRole = await this.getRoleById(dto.roleId);
         userUpdate.role = newRole;
       }
-
       return await this.userRepository.save(userUpdate);
     } catch (error) {
       if (error instanceof HttpException) throw error;
@@ -183,10 +197,76 @@ export class UserService {
   }
 
   // eliminar usuario (admin)
-  async deleteUser(id: number) {
+  async deleteUser(idAdmin: number, idUser: number) {
+    try {
+      const userAdmin = await this.getUserById(idAdmin);
+      const userUser = await this.getUserById(idUser);
+      if (userAdmin.id === userUser.id) {
+        throw new ConflictException('No puedes eliminarte a ti mismo');
+      }
+      return await this.userRepository.remove(userUser);
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      throw new InternalServerErrorException('¡Ups! Error interno');
+    }
+  }
+
+  // obtener estudiante (professor)
+  async getStudent(id: number, role: string) {
+    try {
+      const roleFound = await this.getRoleByName(role);
+      const userFound = await this.userRepository.findOne({
+        where: { id, roleId: roleFound.id },
+      });
+      if (!userFound) throw new NotFoundException('El estudiante no existe');
+      return userFound;
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      throw new InternalServerErrorException('¡Ups! Error interno');
+    }
+  }
+
+  // actualizar mi perfil (propio)
+  async updateMyData(id: number, dto: UpdateMyUserDto) {
+    try {
+      const userFound = await this.getUserById(id);
+      const userSaved = await this.userRepository.save(
+        this.userRepository.merge(userFound, dto),
+      );
+      delete userSaved.password;
+      delete userSaved.createdAt;
+      return userSaved;
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      if (error.code === 'ER_DUP_ENTRY') {
+        throw new ConflictException('El correo ya está en uso');
+      }
+      throw new InternalServerErrorException('¡Ups! Error interno');
+    }
+  }
+
+  // subir foto de perfil (propio)
+  async uploadPhoto(id: number, dto: UploadMyPhotoDto) {
+    try {
+      const myUser = await this.getUserById(id);
+      if (!dto) throw new NotFoundException('No has enviado ninguna foto');
+      return await this.userRepository.save(
+        this.userRepository.merge(myUser, dto),
+      );
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      throw new InternalServerErrorException('¡Ups! Error interno');
+    }
+  }
+
+  // obtener foto de perfil (propio)
+  async getMyPhotoName(id: number) {
     try {
       const user = await this.getUserById(id);
-      return await this.userRepository.remove(user);
+      if (!user.filename) {
+        throw new NotFoundException('No tienes una foto guardada');
+      }
+      return user.filename;
     } catch (error) {
       if (error instanceof HttpException) throw error;
       throw new InternalServerErrorException('¡Ups! Error interno');

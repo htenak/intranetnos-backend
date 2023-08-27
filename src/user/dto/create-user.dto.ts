@@ -32,7 +32,7 @@ export class CreateUserDto {
 
   @IsEmail({}, { message: 'El correo no es válido' })
   @IsOptional()
-  email: string;
+  email?: string;
 
   @IsString({ message: 'El celular debe ser una cadena de texto' })
   @MinLength(9, { message: 'El celular debe tener 9 números' })
@@ -43,15 +43,12 @@ export class CreateUserDto {
   @Min(1, { message: 'El rol debe ser válido' })
   roleId: number;
 
-  @IsOptional()
-  photo?: string;
-
   /**
    * solo se usa al actualizar usuario
    * cuando cambia email
    * */
   @IsOptional()
-  nickname: string;
+  nickname?: string;
 
   /**
    * solo se usa al actualizar usuario

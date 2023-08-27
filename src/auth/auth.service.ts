@@ -32,7 +32,7 @@ export class AuthService {
         .where({ username })
         .addSelect('user.password')
         .getOne();
-      if (!user) throw new NotFoundException('El usuario no existe');
+      if (!user) throw new NotFoundException('Usuario incorrecto');
       return user;
     } catch (error) {
       if (error instanceof HttpException) throw error;

@@ -17,14 +17,14 @@ export class RolesGuard implements CanActivate {
       'roles',
       context.getHandler(),
     );
-    // if (!requiredRoles) {
-    //   return true; // si no se usa roles se permite el acceso
-    // }
+    if (!requiredRoles) {
+      return true; // si no se usa roles se permite el acceso
+    }
     const request = context.switchToHttp().getRequest();
     const userRole = request.user.role; // obtiene role desde el token
 
     if (!requiredRoles.includes(userRole)) {
-      throw new ForbiddenException('No tienes permiso a este recurso');
+      throw new ForbiddenException('No tienes acceso a este recurso');
     }
 
     return requiredRoles.includes(userRole);
