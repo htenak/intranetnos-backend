@@ -108,18 +108,6 @@ export class UserController {
   }
 
   /**
-   * RUTAS PROFESSOR:
-   */
-
-  //obtener estudiante
-  @AuthAndRoles(ROLE.professor)
-  @Get('student/:id')
-  async getStudent(@Param('id', ParseIntPipe) idStudent: number) {
-    const data = await this.userService.getStudent(idStudent, ROLE.student);
-    return { statusCode: HttpStatus.OK, data };
-  }
-
-  /**
    * RUTAS PROPIAS:
    */
 
@@ -167,14 +155,19 @@ export class UserController {
     };
   }
 
-  // obtener mi foto
+  // obtiene foto del usuario logueado
   @AuthAndRoles(ROLE.admin, ROLE.professor, ROLE.student)
-  @Get('my-profile/photo')
+  @Get('my-profile/avatar')
   async getMyPhoto(@Request() req: any, @Res() res: Response) {
-    const fileName = await this.userService.getMyPhotoName(req.user.sub);
-    const filePath = join(__dirname, '..', '..', 'uploads', fileName);
+    if (!req.user.filename) {
+      return res.status(HttpStatus.NOT_FOUND).json({
+        statusCode: HttpStatus.NOT_FOUND,
+        message: 'Aún no tienes una foto de perfil',
+      });
+    }
+    const filePath = join(__dirname, '..', '..', 'uploads', req.user.filename);
     return res.sendFile(filePath);
   }
 
-  // eliminar mi foto
+  // eliminar mi foto de perfil
 }

@@ -55,6 +55,7 @@ export class AuthService {
         sub: userFound.id,
         username: userFound.username,
         role: userFound.role.name,
+        filename: userFound.filename,
       };
       const token = this.jwtService.sign(payload);
       return { data: userFound, token };

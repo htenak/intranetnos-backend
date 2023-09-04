@@ -1,7 +1,9 @@
+import { Class } from 'src/class/entities';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -13,7 +15,7 @@ export class Cycle {
   @Column({ type: 'varchar', nullable: false, unique: true, length: 3 })
   abbreviation: string;
 
-  @Column({ type: 'varchar', nullable: false, length: 255 })
+  @Column({ type: 'varchar', nullable: false, unique: true, length: 255 })
   description: string;
 
   @Column({ name: 'start_date', type: 'date' })
@@ -25,6 +27,9 @@ export class Cycle {
   @Column({ type: 'bool', default: true })
   status: boolean;
 
-  @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
+  @CreateDateColumn({ name: 'created_at', type: 'timestamp', select: false })
   createdAt: Date;
+
+  @OneToMany(() => Class, (classs) => classs.cycle)
+  classes: Class[];
 }

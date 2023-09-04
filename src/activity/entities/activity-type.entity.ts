@@ -19,6 +19,6 @@ export class ActivityType {
   @Column({ name: 'professor_user_id', nullable: false })
   professorUserId: number;
 
-  @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
+  @CreateDateColumn({ name: 'created_at', type: 'timestamp', select: false })
   createdAt: Date;
 }

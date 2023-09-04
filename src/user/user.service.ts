@@ -23,6 +23,10 @@ export class UserService {
     @InjectRepository(Role) private readonly roleRepository: Repository<Role>,
   ) {}
 
+  /**
+   * ROLES:
+   */
+
   // crea los roles si no existen
   async createRolesIfNotExist() {
     try {
@@ -80,6 +84,42 @@ export class UserService {
     }
   }
 
+  /**
+   * USUARIOS:
+   */
+
+  // crea el primer administrador
+  async createAdminIfNotExist() {
+    try {
+      const role = await this.getRoleByName('admin');
+      const firstAdmin = [
+        {
+          name: 'Administrador',
+          lastName1: 'Admin',
+          lastName2: 'Admin',
+          dni: '00000000',
+          phone: '000000000',
+          nickname: 'admin',
+          username: '00000000',
+          password: '00000000',
+          roleId: role.id,
+        },
+      ];
+      for (const adminData of firstAdmin) {
+        const existAdmin = await this.userRepository.findOne({
+          where: { dni: adminData.dni },
+        });
+        if (!existAdmin) {
+          await this.userRepository.save(this.userRepository.create(adminData));
+        }
+      }
+    } catch (error) {
+      throw new InternalServerErrorException(
+        '¡Ups! Error interno al crear el primer administrador',
+      );
+    }
+  }
+
   // obtiene todos o segun status (admin)
   async getUsersByStatus(status: string) {
     try {
@@ -132,6 +172,22 @@ export class UserService {
     }
   }
 
+  // obtiene usuario por id y rol (todos los roles)
+  async getUserByIdAndRoleId(id: number, roleId: number) {
+    try {
+      const person = await this.userRepository.findOne({
+        where: { id, roleId },
+        relations: ['role', 'classes', 'studentsClass', 'studentsClass.classs'],
+        //añadir más relaciones segun necesidad ya sea estudiante o professor
+      });
+      if (!person) throw new NotFoundException('Usuario no encontrado');
+      return person;
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      throw new InternalServerErrorException('¡Ups! Error interno');
+    }
+  }
+
   // crear usuario (admin)
   async createUser(dto: CreateUserDto) {
     try {
@@ -145,10 +201,10 @@ export class UserService {
 
       if (user) {
         if (user.dni === dto.dni) {
-          throw new BadRequestException('El DNI ya está en uso');
+          throw new ConflictException('El DNI ya está en uso');
         }
         if (user.email === dto.email) {
-          throw new BadRequestException('El correo ya está en uso');
+          throw new ConflictException('El correo ya está en uso');
         }
       }
       const createdUser = {
@@ -207,21 +263,9 @@ export class UserService {
       return await this.userRepository.remove(userUser);
     } catch (error) {
       if (error instanceof HttpException) throw error;
-      throw new InternalServerErrorException('¡Ups! Error interno');
-    }
-  }
-
-  // obtener estudiante (professor)
-  async getStudent(id: number, role: string) {
-    try {
-      const roleFound = await this.getRoleByName(role);
-      const userFound = await this.userRepository.findOne({
-        where: { id, roleId: roleFound.id },
-      });
-      if (!userFound) throw new NotFoundException('El estudiante no existe');
-      return userFound;
-    } catch (error) {
-      if (error instanceof HttpException) throw error;
+      if (error.code === 'ER_ROW_IS_REFERENCED_2') {
+        throw new ConflictException('¡Denegado! Registro en uso');
+      }
       throw new InternalServerErrorException('¡Ups! Error interno');
     }
   }
@@ -259,17 +303,5 @@ export class UserService {
     }
   }
 
-  // obtener foto de perfil (propio)
-  async getMyPhotoName(id: number) {
-    try {
-      const user = await this.getUserById(id);
-      if (!user.filename) {
-        throw new NotFoundException('No tienes una foto guardada');
-      }
-      return user.filename;
-    } catch (error) {
-      if (error instanceof HttpException) throw error;
-      throw new InternalServerErrorException('¡Ups! Error interno');
-    }
-  }
+  // eliminar foto de perfil (propio)
 }

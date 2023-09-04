@@ -2,8 +2,11 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Course } from './course.entity';
+import { Class } from 'src/class/entities';
 
 @Entity('careers')
 export class Career {
@@ -16,9 +19,12 @@ export class Career {
   @Column({ type: 'text', nullable: true })
   description: string;
 
-  @Column({ type: 'bool', default: true })
-  status: boolean;
-
-  @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
+  @CreateDateColumn({ name: 'created_at', type: 'timestamp', select: false })
   createdAt: Date;
+
+  @OneToMany(() => Course, (course) => course.career)
+  courses: Course[];
+
+  @OneToMany(() => Class, (classs) => classs.career)
+  classes: Class[];
 }

@@ -17,13 +17,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  /*
-   * lo que retorna este metodo es lo que veré al
-   * extraer datos de req.user
-   */
   validate(payload: any) {
-    const { sub, username, role } = payload;
+    const { role } = payload;
     if (!role) throw new UnauthorizedException('No tienes ningún rol asignado');
-    return { sub, username, role };
+    return payload;
   }
 }

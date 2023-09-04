@@ -18,7 +18,7 @@ export class Role {
   @Column({ type: 'varchar', length: 255, nullable: true })
   description: string;
 
-  @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
+  @CreateDateColumn({ name: 'created_at', type: 'timestamp', select: false })
   createdAt: Date;
 
   @OneToMany(() => User, (user) => user.role)

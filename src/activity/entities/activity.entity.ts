@@ -31,6 +31,6 @@ export class Activity {
   @Column({ type: 'bool', default: true })
   status: boolean;
 
-  @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
+  @CreateDateColumn({ name: 'created_at', type: 'timestamp', select: false })
   createdAt: Date;
 }

@@ -2,8 +2,12 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Day } from './day.entity';
+import { Class } from 'src/class/entities';
 
 @Entity('schedules')
 export class Schedule {
@@ -22,6 +26,17 @@ export class Schedule {
   @Column({ name: 'class_id', nullable: false })
   classId: number;
 
-  @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
+  @Column({ type: 'bool', default: true })
+  status: boolean;
+
+  @CreateDateColumn({ name: 'created_at', type: 'timestamp', select: false })
   createdAt: Date;
+
+  @ManyToOne(() => Day, (day) => day.schedules)
+  @JoinColumn({ name: 'day_id' })
+  day: Day;
+
+  @ManyToOne(() => Class, (classs) => classs.schedules)
+  @JoinColumn({ name: 'class_id' })
+  classs: Class;
 }

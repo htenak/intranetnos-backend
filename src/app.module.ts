@@ -37,7 +37,7 @@ import { ScheduleModule } from './schedule/schedule.module';
     }),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'uploads'),
-      serveRoot: '/avatars',
+      serveRoot: '/avatar',
     }),
     ConfigModule.forRoot({ isGlobal: true, envFilePath: '.env' }),
     UserModule,

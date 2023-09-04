@@ -6,17 +6,19 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { hash } from 'bcryptjs';
 import { Role } from './role.entity';
+import { Class, StudentClass } from 'src/class/entities';
 
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar', nullable: false })
+  @Column({ type: 'varchar' })
   name: string;
 
   @Column({ name: 'last_name1', type: 'varchar' })
@@ -34,7 +36,7 @@ export class User {
   @Column({ type: 'varchar', length: 9 })
   phone: string;
 
-  @Column({ type: 'varchar', length: 50, nullable: false, unique: true })
+  @Column({ type: 'varchar', length: 50, nullable: false })
   nickname: string;
 
   @Column({ type: 'varchar', nullable: false, length: 8, unique: true })
@@ -52,12 +54,18 @@ export class User {
   @Column({ type: 'bool', default: true })
   status: boolean;
 
-  @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
+  @CreateDateColumn({ name: 'created_at', type: 'timestamp', select: false })
   createdAt: Date;
 
   @ManyToOne(() => Role, (role) => role.user) // role.user porque es la propiedad de @OneToMany() en Role
   @JoinColumn({ name: 'role_id' }) //especifica columna con la que se hace relacion
   role: Role;
+
+  @OneToMany(() => Class, (classs) => classs.professor)
+  classes: Class[];
+
+  @OneToMany(() => StudentClass, (studentClass) => studentClass.student)
+  studentsClass: StudentClass[];
 
   @BeforeInsert()
   @BeforeUpdate()
