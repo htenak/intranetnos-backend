@@ -12,6 +12,7 @@ import {
 import { hash } from 'bcryptjs';
 import { Role } from './role.entity';
 import { Class, StudentClass } from 'src/class/entities';
+import { ActivityType } from 'src/activity/entities';
 
 @Entity('users')
 export class User {
@@ -61,9 +62,15 @@ export class User {
   @JoinColumn({ name: 'role_id' }) //especifica columna con la que se hace relacion
   role: Role;
 
+  // del profesor
   @OneToMany(() => Class, (classs) => classs.professor)
   classes: Class[];
 
+  // del profesor
+  @OneToMany(() => ActivityType, (activityType) => activityType.professor)
+  activitiesType: ActivityType[];
+
+  // del estudiante
   @OneToMany(() => StudentClass, (studentClass) => studentClass.student)
   studentsClass: StudentClass[];
 

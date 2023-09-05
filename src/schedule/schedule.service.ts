@@ -1,4 +1,5 @@
 import {
+  ConflictException,
   HttpException,
   Injectable,
   InternalServerErrorException,
@@ -69,7 +70,7 @@ export class ScheduleService {
     }
   }
 
-  // obtiene horarios
+  // obtiene horarios (admin)
   async getSchedules() {
     try {
       return await this.scheduleRepository.find();
@@ -78,19 +79,13 @@ export class ScheduleService {
     }
   }
 
-  // obtiene horario por id
+  // obtiene horario por id (admin)
   async getScheduleById(id: number) {
     try {
       const schedule = await this.scheduleRepository.findOne({
         where: { id },
-        relations: [
-          'classs',
-          'classs.cycle',
-          'classs.career',
-          'classs.course',
-          'classs.professor',
-          'day',
-        ],
+        relations: ['classs', 'classs.career', 'day'],
+        // agregar mas relaciones segun necesidad
       });
       if (!schedule) throw new NotFoundException('El horario no existe');
       return schedule;
@@ -100,7 +95,7 @@ export class ScheduleService {
     }
   }
 
-  // crear horario
+  // crear horario (admin)
   async createSchedule(dto: CreateScheduleDto) {
     try {
       await this.getDayById(dto.dayId); //valida que el día exista
@@ -114,7 +109,7 @@ export class ScheduleService {
     }
   }
 
-  // actualiza horario
+  // actualiza horario (admin)
   async updateSchedule(id: number, dto: UpdateScheduleDto) {
     try {
       const scheduleFound = await this.getScheduleById(id);
@@ -132,6 +127,20 @@ export class ScheduleService {
       return await this.scheduleRepository.save(scheduleUpdate);
     } catch (error) {
       if (error instanceof HttpException) throw error;
+      throw new InternalServerErrorException('¡Ups! Error interno');
+    }
+  }
+
+  // elimina horario (admin)
+  async deleteSchedule(id: number) {
+    try {
+      const scheduleFound = await this.getScheduleById(id);
+      return await this.scheduleRepository.remove(scheduleFound);
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      if (error.code === 'ER_ROW_IS_REFERENCED_2') {
+        throw new ConflictException('¡Denegado! Registro en uso');
+      }
       throw new InternalServerErrorException('¡Ups! Error interno');
     }
   }

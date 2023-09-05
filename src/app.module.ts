@@ -19,6 +19,8 @@ import { ClassModule } from './class/class.module';
 import { GradeModule } from './grade/grade.module';
 import { ActivityModule } from './activity/activity.module';
 import { ScheduleModule } from './schedule/schedule.module';
+import { ProfessorModule } from './professor/professor.module';
+import { StudentModule } from './student/student.module';
 
 @Module({
   imports: [
@@ -47,6 +49,8 @@ import { ScheduleModule } from './schedule/schedule.module';
     GradeModule,
     ActivityModule,
     ScheduleModule,
+    ProfessorModule,
+    StudentModule,
   ],
   controllers: [AppController],
   providers: [AppService],

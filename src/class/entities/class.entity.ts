@@ -11,6 +11,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { StudentClass } from './student-class.entity';
+import { Activity } from 'src/activity/entities';
 
 @Entity('classes')
 export class Class {
@@ -63,4 +64,7 @@ export class Class {
 
   @OneToMany(() => StudentClass, (studentClass) => studentClass.classs)
   studentsClass: StudentClass[];
+
+  @OneToMany(() => Activity, (activity) => activity.classId)
+  avtivities: Activity[];
 }

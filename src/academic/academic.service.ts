@@ -95,6 +95,9 @@ export class AcademicService {
       return await this.careerRepository.remove(career);
     } catch (error) {
       if (error instanceof HttpException) throw error;
+      if (error.code === 'ER_ROW_IS_REFERENCED_2') {
+        throw new ConflictException('¡Denegado! Registro en uso');
+      }
       throw new InternalServerErrorException('¡Ups! Error interno');
     }
   }
@@ -168,6 +171,9 @@ export class AcademicService {
       return await this.cycleRepository.remove(cycle);
     } catch (error) {
       if (error instanceof HttpException) throw error;
+      if (error.code === 'ER_ROW_IS_REFERENCED_2') {
+        throw new ConflictException('¡Denegado! Registro en uso');
+      }
       throw new InternalServerErrorException('¡Ups! Error interno');
     }
   }
@@ -235,6 +241,9 @@ export class AcademicService {
       return await this.courseTypeRepository.remove(courseType);
     } catch (error) {
       if (error instanceof HttpException) throw error;
+      if (error.code === 'ER_ROW_IS_REFERENCED_2') {
+        throw new ConflictException('¡Denegado! Registro en uso');
+      }
       throw new InternalServerErrorException('¡Ups! Error interno');
     }
   }
@@ -324,6 +333,9 @@ export class AcademicService {
       return await this.courseRepository.remove(course);
     } catch (error) {
       if (error instanceof HttpException) throw error;
+      if (error.code === 'ER_ROW_IS_REFERENCED_2') {
+        throw new ConflictException('¡Denegado! Registro en uso');
+      }
       throw new InternalServerErrorException('¡Ups! Error interno');
     }
   }

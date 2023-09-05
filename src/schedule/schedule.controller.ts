@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpStatus,
   Param,
@@ -74,6 +75,18 @@ export class ScheduleController {
     return {
       statusCode: HttpStatus.OK,
       message: 'Se actualizó el horarió',
+      data,
+    };
+  }
+
+  // elimina horario
+  @AuthAndRoles(ROLE.admin)
+  @Delete('schedules/:id')
+  async deleteSchedule(@Param('id', ParseIntPipe) id: number) {
+    const data = await this.scheduleService.deleteSchedule(id);
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Se eliminó el horario',
       data,
     };
   }

@@ -208,6 +208,7 @@ export class ClassService {
     }
   }
 
+  // elimina clase del estudiante (admin)
   async deleteStudentClass(id: number) {
     try {
       const studentClass = await this.getStudentClassById(id);
