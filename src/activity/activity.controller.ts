@@ -14,7 +14,12 @@ import { ActivityService } from './activity.service';
 import { AuthAndRoles } from 'src/common/decorators';
 import { ApiTags } from '@nestjs/swagger';
 import { ROLE } from 'src/config/constants';
-import { CreateActivityTypeDto, UpdateActivityTypeDto } from './dto';
+import {
+  CreateActivityDto,
+  CreateActivityTypeDto,
+  UpdateActivityDto,
+  UpdateActivityTypeDto,
+} from './dto';
 
 @ApiTags('Activities routes')
 @Controller('activity')
@@ -116,4 +121,87 @@ export class ActivityController {
   /**
    * RUTAS ACTIVIDADES:
    */
+
+  // obtiene actividades propias del profesor
+  @AuthAndRoles(ROLE.professor)
+  @Get('professor/activities')
+  async getActivitiesProfessor(@Request() req: any) {
+    const data = await this.activityService.getActivitiesProfessor(
+      req.user.sub,
+    );
+    return {
+      statusCode: HttpStatus.OK,
+      data,
+    };
+  }
+
+  // obtiene actividad propia del profesor
+  @AuthAndRoles(ROLE.professor)
+  @Get('professor/activities/:id')
+  async getActivityProfessorById(
+    @Request() req: any,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    const data = await this.activityService.getActivityProfessorById(
+      req.user.sub,
+      id,
+    );
+    return { statusCode: HttpStatus.OK, data };
+  }
+
+  // crea actividad propia del profesor
+  @AuthAndRoles(ROLE.professor)
+  @Post('professor/activities')
+  async createActivityProfessor(
+    @Request() req: any,
+    @Body() dto: CreateActivityDto,
+  ) {
+    const data = await this.activityService.createAtivityProfessor(
+      req.user.sub,
+      dto,
+    );
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Se registró la actividad',
+      data,
+    };
+  }
+
+  // actualiza la actividad propia del profesor
+  @AuthAndRoles(ROLE.professor)
+  @Put('professor/activities/:id')
+  async updateActivityProfessor(
+    @Request() req: any,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateActivityDto,
+  ) {
+    const data = await this.activityService.updateActivityProfessor(
+      req.user.sub,
+      id,
+      dto,
+    );
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Se actualizó la actividad',
+      data,
+    };
+  }
+
+  // elimina el tipo de actividad propio del profesor
+  @AuthAndRoles(ROLE.professor)
+  @Delete('professor/activities/:id')
+  async deleteActivityProfessor(
+    @Request() req: any,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    const data = await this.activityService.deleteActivityProfessor(
+      req.user.sub,
+      id,
+    );
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Se eliminó la actividad',
+      data,
+    };
+  }
 }

@@ -3,10 +3,10 @@ import { ActivityService } from './activity.service';
 import { ActivityController } from './activity.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Activity, ActivityType } from './entities';
-import { AcademicModule } from 'src/academic/academic.module';
+import { ClassModule } from 'src/class/class.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ActivityType, Activity]), AcademicModule],
+  imports: [TypeOrmModule.forFeature([ActivityType, Activity]), ClassModule],
   providers: [ActivityService],
   controllers: [ActivityController],
 })

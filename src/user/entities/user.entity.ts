@@ -12,7 +12,7 @@ import {
 import { hash } from 'bcryptjs';
 import { Role } from './role.entity';
 import { Class, StudentClass } from 'src/class/entities';
-import { ActivityType } from 'src/activity/entities';
+import { Activity, ActivityType } from 'src/activity/entities';
 
 @Entity('users')
 export class User {
@@ -69,6 +69,10 @@ export class User {
   // del profesor
   @OneToMany(() => ActivityType, (activityType) => activityType.professor)
   activitiesType: ActivityType[];
+
+  // del professor
+  @OneToMany(() => Activity, (activity) => activity.professor)
+  activities: Activity[];
 
   // del estudiante
   @OneToMany(() => StudentClass, (studentClass) => studentClass.student)

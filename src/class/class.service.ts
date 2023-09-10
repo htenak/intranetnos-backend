@@ -221,4 +221,33 @@ export class ClassService {
       throw new InternalServerErrorException('¡Ups! Error interno');
     }
   }
+
+  // obtiene clases según profesor (professor)
+  async getClassesProfessor(professorUserId: number) {
+    try {
+      // await this.academicService.getProfessorById(professorUserId);
+      const classes = await this.classRepository.find({
+        where: { professorUserId },
+      });
+      return classes;
+    } catch (error) {
+      throw new InternalServerErrorException('¡Ups! Error interno');
+    }
+  }
+
+  // obtiene clase según profesor (professor)
+  async getClassProfessorById(professorUserId: number, id: number) {
+    try {
+      // await this.academicService.getProfessorById(professorUserId);
+      const classs = await this.classRepository.findOne({
+        where: { id, professorUserId },
+      });
+      if (!classs)
+        throw new NotFoundException('La clase del profesor no existe');
+      return classs;
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      throw new InternalServerErrorException('¡Ups! Error interno');
+    }
+  }
 }

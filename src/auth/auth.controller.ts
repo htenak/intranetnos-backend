@@ -1,7 +1,9 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpStatus, Param, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginAuthDto } from './dto';
 import { ApiTags } from '@nestjs/swagger';
+import { AuthAndRoles } from 'src/common/decorators';
+import { ROLE } from 'src/config/constants';
 
 @ApiTags('Auth routes')
 @Controller('auth')
@@ -11,6 +13,18 @@ export class AuthController {
   @Post('login')
   async login(@Body() dto: LoginAuthDto) {
     const { data, token } = await this.authService.login(dto);
-    return { message: 'Datos correctos', data, token };
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Datos correctos',
+      data,
+      token,
+    };
+  }
+
+  @AuthAndRoles(ROLE.admin, ROLE.professor, ROLE.student)
+  @Get('renew/:token')
+  async renewToken(@Param('token') accesToken: string) {
+    const { data, token } = await this.authService.renewToken(accesToken);
+    return { statusCode: HttpStatus.OK, data, token };
   }
 }

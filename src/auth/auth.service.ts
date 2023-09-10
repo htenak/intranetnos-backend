@@ -4,6 +4,7 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { compare } from 'bcryptjs';
@@ -62,6 +63,39 @@ export class AuthService {
     } catch (error) {
       if (error instanceof HttpException) throw error;
       throw new InternalServerErrorException('¡Ups! Error interno');
+    }
+  }
+
+  // renueva el token
+  async renewToken(token: string) {
+    try {
+      // verificar y decodificar el token existente
+      const decodedToken = this.jwtService.verify(token);
+      if (!decodedToken) {
+        throw new UnauthorizedException('Token inválido');
+      }
+
+      // obtener informacion del usuario basada en el token
+      const userFound = await this.getUserByUsername(decodedToken.username);
+
+      // crear un nuevo payload con la información del usuario
+      const payload = {
+        sub: userFound.id,
+        username: userFound.username,
+        role: userFound.role.name,
+        filename: userFound.filename,
+      };
+
+      // generar un nuevo token
+      const newToken = this.jwtService.sign(payload);
+
+      // devolver el nuevo token
+      return { data: userFound, token: newToken };
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      throw new UnauthorizedException('No se pudo renovar el token.');
     }
   }
 }

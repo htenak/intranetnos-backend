@@ -12,6 +12,11 @@ async function bootstrap() {
 
   initSwagger(app);
 
+  app.enableCors({
+    origin: '*',
+    methods: 'GET,POST,PUT,DELETE',
+  });
+
   app.useGlobalPipes(new ValidationPipe()); // importante para que funcione class-validator
 
   await app.listen(port);

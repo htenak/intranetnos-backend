@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { ActivityType } from './activity-type.entity';
 import { Class } from 'src/class/entities';
+import { User } from 'src/user/entities';
 
 @Entity('activities')
 export class Activity {
@@ -35,6 +36,9 @@ export class Activity {
   @Column({ name: 'class_id', nullable: false })
   classId: number;
 
+  @Column({ name: 'professor_user_id', nullable: false })
+  professorUserId: number;
+
   @Column({ type: 'bool', default: true })
   status: boolean;
 
@@ -48,4 +52,8 @@ export class Activity {
   @ManyToOne(() => Class, (classs) => classs.avtivities)
   @JoinColumn({ name: 'class_id' })
   classs: Class;
+
+  @ManyToOne(() => User, (user) => user.activities)
+  @JoinColumn({ name: 'professor_user_id' })
+  professor: User;
 }
