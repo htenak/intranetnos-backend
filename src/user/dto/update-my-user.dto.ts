@@ -1,9 +1,21 @@
-import { IsEmail, IsOptional, IsString, MinLength } from 'class-validator';
+import {
+  IsEmail,
+  IsOptional,
+  IsString,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 
 export class UpdateMyUserDto {
   @IsEmail({}, { message: 'El correo no es válido' })
   @IsOptional()
   email?: string;
+
+  @IsString({ message: 'El celular debe ser una cadena de texto' })
+  @IsOptional()
+  @MinLength(9, { message: 'El celular debe tener 9 números' })
+  @MaxLength(9, { message: 'El celular debe tener 9 números' })
+  phone?: string;
 
   @IsString({ message: 'El apodo debe ser una cadena de texto' })
   @IsOptional()

@@ -78,6 +78,9 @@ export class AuthService {
       // obtener informacion del usuario basada en el token
       const userFound = await this.getUserByUsername(decodedToken.username);
 
+      // eliminamos la password de la respuesta
+      delete userFound.password;
+
       // crear un nuevo payload con la información del usuario
       const payload = {
         sub: userFound.id,
