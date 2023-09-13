@@ -19,7 +19,7 @@ export class UpdateMyUserDto {
 
   @IsString({ message: 'El apodo debe ser una cadena de texto' })
   @IsOptional()
-  @MinLength(3)
+  @MinLength(3, { message: 'El apodo debe tener al menos 3 caracteres' })
   nickname?: string;
 
   @IsString({ message: 'La clave debe ser una cadena de caracteres' })

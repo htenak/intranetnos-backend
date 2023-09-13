@@ -126,7 +126,7 @@ export class UserController {
     const data = await this.userService.updateMyData(req.user.sub, dto);
     return {
       statusCode: HttpStatus.OK,
-      message: 'Se actualizó tu perfil',
+      message: 'Se actualizaron tus datos',
       data,
     };
   }
