@@ -229,11 +229,21 @@ export class UserService {
     try {
       const userFound = await this.getUserById(id);
       if (dto.dni) {
-        dto.username = dto.dni;
-        dto.password = dto.dni;
+        // si no se cambia el dni mantener la password
+        if (dto.dni === userFound.dni) {
+          delete dto.dni;
+        } else {
+          dto.username = dto.dni;
+          dto.password = dto.dni;
+        }
       }
       if (dto.email) {
-        dto.nickname = dto.email;
+        // si no se cambia el email mantener el nickname
+        if (dto.email === userFound.email) {
+          delete dto.email;
+        } else {
+          dto.nickname = dto.email;
+        }
       }
       const userUpdate = this.userRepository.merge(userFound, dto);
 
