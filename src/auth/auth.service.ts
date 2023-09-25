@@ -45,6 +45,13 @@ export class AuthService {
   async login(dto: LoginAuthDto) {
     try {
       const userFound = await this.getUserByUsername(dto.username);
+
+      // validamos el estado del usuario
+      if (userFound) {
+        if (userFound.status === false) {
+          throw new ForbiddenException('Tu cuenta está inhabilitada');
+        }
+      }
       const checkPass = compare(dto.password, userFound.password);
       if (!(await checkPass)) throw new ForbiddenException('Clave incorrecta');
 

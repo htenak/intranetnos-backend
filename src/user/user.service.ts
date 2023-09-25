@@ -94,7 +94,7 @@ export class UserService {
       const role = await this.getRoleByName('admin');
       const firstAdmin = [
         {
-          name: 'Administrador',
+          name: 'Admin',
           lastName1: 'Admin',
           lastName2: 'Admin',
           dni: '00000000',
@@ -209,7 +209,7 @@ export class UserService {
       }
       const createdUser = {
         ...dto,
-        nickname: dto.email || `${dto.name}${dto.dni}`,
+        nickname: dto.email || `${dto.lastName1}${dto.dni}`,
         username: dto.dni,
         password: dto.dni,
       };
