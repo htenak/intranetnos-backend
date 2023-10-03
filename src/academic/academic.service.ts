@@ -181,7 +181,9 @@ export class AcademicService {
   // obtiene tipos de curso (admin)
   async getCourseTypes() {
     try {
-      return await this.courseTypeRepository.find();
+      return await this.courseTypeRepository.find({
+        relations: ['courses'],
+      });
     } catch (error) {
       throw new InternalServerErrorException('¡Ups! Error interno');
     }
@@ -310,9 +312,13 @@ export class AcademicService {
         const newCourseType = await this.getCourseTypeById(dto.courseTypeId);
         courseUpdate.courseType = newCourseType;
       }
+      // si se cambia carrera
       if (dto.careerId) {
         const newCareer = await this.getCareerById(dto.careerId);
         courseUpdate.career = newCareer;
+        // si no establecer en null (carrera es opcional)
+      } else {
+        courseUpdate.career = null;
       }
       return await this.courseRepository.save(courseUpdate);
     } catch (error) {

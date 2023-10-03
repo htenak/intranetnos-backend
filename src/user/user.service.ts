@@ -94,9 +94,9 @@ export class UserService {
       const role = await this.getRoleByName('admin');
       const firstAdmin = [
         {
-          name: 'Admin',
-          lastName1: 'Admin',
-          lastName2: 'Admin',
+          name: 'ADMIN',
+          lastName1: 'ADMIN',
+          lastName2: 'ADMIN',
           dni: '00000000',
           phone: '000000000',
           nickname: 'admin',
