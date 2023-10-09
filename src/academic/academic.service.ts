@@ -387,4 +387,33 @@ export class AcademicService {
       throw new InternalServerErrorException('¡Ups! Error interno');
     }
   }
+
+  /* obtiene totales de: usuarios
+   * (admin, professor, student),
+   * carreras y cursos
+   * (todos)
+   */
+  async getTotalsAcademic() {
+    try {
+      const adminRole = await this.userService.getRoleByName('admin');
+
+      const careers = await this.getCareers();
+      const courses = await this.getCourses();
+      const users = await this.userService.getUsersByStatus('*');
+      const admins = await this.userService.getUsersByRoleId(adminRole.id);
+      const professors = await this.getProfessors();
+      const students = await this.getStudents();
+      return {
+        totalCareers: careers.length,
+        totalCourses: courses.length,
+        totalUsers: users.length,
+        totalAdmins: admins.length,
+        totalProfessors: professors.length,
+        totalStudents: students.length,
+      };
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      throw new InternalServerErrorException('¡Ups! Error interno');
+    }
+  }
 }

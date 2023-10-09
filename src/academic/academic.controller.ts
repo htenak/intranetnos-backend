@@ -311,4 +311,11 @@ export class AcademicController {
       data,
     };
   }
+
+  // obtiene totales (libre)
+  @Get('totals')
+  async getTotalsAcademic() {
+    const data = await this.academicService.getTotalsAcademic();
+    return { statusCode: HttpStatus.OK, data };
+  }
 }
