@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   ConflictException,
   HttpException,
   Injectable,
@@ -8,6 +7,8 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { join } from 'path';
+import { unlinkSync } from 'fs';
 import { Role, User } from './entities';
 import {
   CreateUserDto,
@@ -314,4 +315,19 @@ export class UserService {
   }
 
   // eliminar foto de perfil (propio)
+  async deletePhoto(id: number) {
+    try {
+      const myUser = await this.getUserById(id);
+      if (!myUser.filename) throw new NotFoundException('Sin foto de perfil');
+      const filePath = join(__dirname, '..', '..', 'uploads', myUser.filename);
+      unlinkSync(filePath);
+      return await this.userRepository.save(
+        this.userRepository.merge(myUser, { filename: null }),
+      );
+    } catch (error) {
+      console.log(error);
+      if (error instanceof HttpException) throw error;
+      throw new InternalServerErrorException('¡Ups! Error interno');
+    }
+  }
 }

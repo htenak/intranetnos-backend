@@ -151,7 +151,7 @@ export class UserController {
     return {
       statusCode: HttpStatus.OK,
       message: 'Se subió tu foto de perfil',
-      data: data.filename,
+      data: data,
     };
   }
 
@@ -170,4 +170,14 @@ export class UserController {
   }
 
   // eliminar mi foto de perfil
+  @AuthAndRoles(ROLE.admin, ROLE.professor, ROLE.student)
+  @Delete('my-profile/delete-photo')
+  async deleteMyPhoto(@Request() req: any) {
+    const data = await this.userService.deletePhoto(req.user.sub);
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Se eliminó tu foto de perfil',
+      data: data,
+    };
+  }
 }
