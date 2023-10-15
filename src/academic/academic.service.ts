@@ -1,9 +1,11 @@
 import {
   ConflictException,
   HttpException,
+  Inject,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
+  forwardRef,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -19,6 +21,8 @@ import {
   UpdateCycleDto,
 } from './dto';
 import { UserService } from 'src/user/user.service';
+import { ClassService } from 'src/class/class.service';
+import { ActivityService } from 'src/activity/activity.service';
 
 @Injectable()
 export class AcademicService {
@@ -32,6 +36,11 @@ export class AcademicService {
     @InjectRepository(Course)
     private readonly courseRepository: Repository<Course>,
     private readonly userService: UserService,
+    private readonly activityService: ActivityService,
+
+    // dependencia circular
+    @Inject(forwardRef(() => ClassService))
+    private readonly classService: ClassService,
   ) {}
 
   // obtiene carreras (admin)
@@ -332,6 +341,19 @@ export class AcademicService {
     }
   }
 
+  // actualizar estado de curso (admin)
+  async updateStatusCourse(id: number, status: boolean) {
+    try {
+      const courseFound = await this.getCourseById(id);
+      return await this.courseRepository.save(
+        this.courseRepository.merge(courseFound, { status }),
+      );
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      throw new InternalServerErrorException('¡Ups! Error interno');
+    }
+  }
+
   // elimina curso (admin)
   async deleteCourse(id: number) {
     try {
@@ -396,20 +418,27 @@ export class AcademicService {
   async getTotalsAcademic() {
     try {
       const adminRole = await this.userService.getRoleByName('admin');
+      const invitedRole = await this.userService.getRoleByName('user');
 
-      const careers = await this.getCareers();
-      const courses = await this.getCourses();
       const users = await this.userService.getUsersByStatus('*');
       const admins = await this.userService.getUsersByRoleId(adminRole.id);
       const professors = await this.getProfessors();
       const students = await this.getStudents();
+      const inviteds = await this.userService.getUsersByRoleId(invitedRole.id);
+      const careers = await this.getCareers();
+      const courses = await this.getCourses();
+      const classes = await this.classService.getClasses();
+      const activities = await this.activityService.getActivities();
       return {
-        totalCareers: careers.length,
-        totalCourses: courses.length,
         totalUsers: users.length,
         totalAdmins: admins.length,
         totalProfessors: professors.length,
         totalStudents: students.length,
+        totalInviteds: inviteds.length,
+        totalCareers: careers.length,
+        totalCourses: courses.length,
+        totalClasses: classes.length,
+        totalActivities: activities.length,
       };
     } catch (error) {
       if (error instanceof HttpException) throw error;
