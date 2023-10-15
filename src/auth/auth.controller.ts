@@ -21,7 +21,6 @@ export class AuthController {
     };
   }
 
-  @AuthAndRoles(ROLE.admin, ROLE.professor, ROLE.student)
   @Get('renew/:token')
   async renewToken(@Param('token') accesToken: string) {
     const { data, token } = await this.authService.renewToken(accesToken);

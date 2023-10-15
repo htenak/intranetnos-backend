@@ -79,7 +79,9 @@ export class AuthService {
       // verificar y decodificar el token existente
       const decodedToken = this.jwtService.verify(token);
       if (!decodedToken) {
-        throw new UnauthorizedException('Token inválido');
+        throw new UnauthorizedException(
+          'Token inválido o expirado, actualiza la página',
+        );
       }
 
       // obtener informacion del usuario basada en el token
