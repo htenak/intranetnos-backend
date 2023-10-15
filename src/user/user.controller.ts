@@ -112,7 +112,7 @@ export class UserController {
    */
 
   // obtener mi perfil
-  @AuthAndRoles(ROLE.admin, ROLE.professor, ROLE.student)
+  @AuthAndRoles(ROLE.admin, ROLE.professor, ROLE.student, ROLE.user)
   @Get('my-profile/data')
   async getMyData(@Request() req: any) {
     const data = await this.userService.getUserById(req.user.sub);
