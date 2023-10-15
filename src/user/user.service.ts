@@ -121,6 +121,38 @@ export class UserService {
     }
   }
 
+  // crea usuario para invitados (no tiene acceso a ningun recurso)
+  async createUserIfNotExist() {
+    try {
+      const role = await this.getRoleByName('user');
+      const firstAdmin = [
+        {
+          name: 'INVITADO',
+          lastName1: 'INVITADO',
+          lastName2: 'INVITADO',
+          dni: '00000001',
+          phone: '000000000',
+          nickname: 'USUARIO',
+          username: 'user',
+          password: '123',
+          roleId: role.id,
+        },
+      ];
+      for (const adminData of firstAdmin) {
+        const existAdmin = await this.userRepository.findOne({
+          where: { dni: adminData.dni },
+        });
+        if (!existAdmin) {
+          await this.userRepository.save(this.userRepository.create(adminData));
+        }
+      }
+    } catch (error) {
+      throw new InternalServerErrorException(
+        '¡Ups! Error interno al crear el primer administrador',
+      );
+    }
+  }
+
   // obtiene todos o segun status (admin)
   async getUsersByStatus(status: string) {
     try {
