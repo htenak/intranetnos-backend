@@ -9,5 +9,6 @@ import { ClassModule } from 'src/class/class.module';
   imports: [TypeOrmModule.forFeature([ActivityType, Activity]), ClassModule],
   providers: [ActivityService],
   controllers: [ActivityController],
+  exports: [ActivityService],
 })
 export class ActivityModule {}

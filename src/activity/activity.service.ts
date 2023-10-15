@@ -1,9 +1,11 @@
 import {
   ConflictException,
   HttpException,
+  Inject,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
+  forwardRef,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Activity, ActivityType } from './entities';
@@ -30,6 +32,15 @@ export class ActivityService {
   async getActivityTypes() {
     try {
       return await this.activityTypeRepository.find({ relations: [] });
+    } catch (error) {
+      throw new InternalServerErrorException('¡Ups! Error interno');
+    }
+  }
+
+  // obtiene todas las actividades (admin)
+  async getActivities() {
+    try {
+      return await this.activityRepository.find({ relations: [] });
     } catch (error) {
       throw new InternalServerErrorException('¡Ups! Error interno');
     }
