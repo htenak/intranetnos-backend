@@ -1,9 +1,11 @@
 import {
   ConflictException,
   HttpException,
+  Inject,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
+  forwardRef,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Class, StudentClass } from './entities';
@@ -24,6 +26,9 @@ export class ClassService {
     private readonly classRepository: Repository<Class>,
     @InjectRepository(StudentClass)
     private readonly studentClassRepository: Repository<StudentClass>,
+
+    // dependencia circular
+    @Inject(forwardRef(() => AcademicService))
     private readonly academicService: AcademicService,
   ) {}
 
@@ -87,6 +92,25 @@ export class ClassService {
   async updateClass(id: number, dto: UpdateClassDto) {
     try {
       const classFound = await this.getClassById(id);
+      // primero verifico si la clase ya existe
+      const classs = await this.classRepository
+        .createQueryBuilder('class')
+        .where(
+          `class.id != :id AND
+              class.cycleId = :cycleId AND 
+              class.careerId = :careerId AND 
+              class.courseId = :courseId AND 
+              class.professorUserId = :professorUserId`,
+          {
+            id,
+            cycleId: dto.cycleId,
+            careerId: dto.careerId,
+            courseId: dto.courseId,
+            professorUserId: dto.professorUserId,
+          },
+        )
+        .getOne();
+      if (classs) throw new ConflictException('La clase ya existe');
       const classUpdate = this.classRepository.merge(classFound, dto);
       if (dto.cycleId) {
         const newCycle = await this.academicService.getCycleById(dto.cycleId);

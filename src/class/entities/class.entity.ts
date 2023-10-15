@@ -31,11 +31,11 @@ export class Class {
   professorUserId: number;
 
   @Column({
-    name: 'course_professor_cycle',
+    name: 'denomination',
     type: 'varchar',
     nullable: false,
   })
-  courseProfessorCycle: string;
+  denomination: string;
 
   @Column({ type: 'bool', default: true })
   status: boolean;

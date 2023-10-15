@@ -17,6 +17,6 @@ export class CreateClassDto {
   @Min(1, { message: 'El numero identificador del profesor es inválido' })
   professorUserId: number;
 
-  @IsString({ message: 'Curso-Profesor-Ciclo debe ser una cadena de texto' })
-  courseProfessorCycle: string;
+  @IsString({ message: 'La denominación debe ser una cadena de texto' })
+  denomination: string;
 }
