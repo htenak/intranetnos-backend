@@ -13,6 +13,7 @@ export const RoleInitializerProvider: Provider = {
   useFactory: async (userService: UserService) => {
     await userService.createRolesIfNotExist();
     await userService.createAdminIfNotExist();
+    await userService.createUserIfNotExist();
   },
   inject: [UserService],
 };
