@@ -35,9 +35,17 @@ export class ClassService {
   // obtiene clases (admin)
   async getClasses() {
     try {
-      return await this.classRepository.find({
-        relations: ['cycle', 'career', 'course', 'professor', 'studentsClass'],
-      });
+      const classes = await this.classRepository
+        .createQueryBuilder('class')
+        .leftJoinAndSelect('class.career', 'career')
+        .leftJoinAndSelect('class.studentsClass', 'studentsClass')
+
+        // solo selecciono solo los nombres de los estudiantes
+        .leftJoin('studentsClass.student', 'student')
+        .addSelect(['student.name', 'student.lastName1', 'student.lastName2'])
+
+        .getMany();
+      return classes;
     } catch (error) {
       throw new InternalServerErrorException('¡Ups! Error interno');
     }
@@ -48,7 +56,8 @@ export class ClassService {
     try {
       const classs = await this.classRepository.findOne({
         where: { id },
-        relations: ['cycle', 'career', 'course', 'professor', 'studentsClass'],
+        // relations: ['cycle', 'career', 'course', 'professor'],
+        relations: ['career'],
       });
       if (!classs) throw new NotFoundException('La clase no existe');
       return classs;
@@ -155,7 +164,7 @@ export class ClassService {
     }
   }
 
-  // obtiene clases estudiantes (admin)
+  // obtiene todas las clases estudiantes (admin)
   async getStudentClasses() {
     try {
       return await this.studentClassRepository.find({
@@ -211,6 +220,19 @@ export class ClassService {
   async updateStudentClass(id: number, dto: UpdateStudentClassDto) {
     try {
       const studentClassFound = await this.getStudentClassById(id);
+      // verifico si la clase del estudiante ya existe
+      const studentClass = await this.studentClassRepository
+        .createQueryBuilder('studentClass')
+        .where(
+          `studentClass.id != :id AND 
+            studentClass.classId = :classId AND 
+            studentClass.studentUserId = :studentUserId`,
+          { id, classId: dto.classId, studentUserId: dto.studentUserId },
+        )
+        .getOne();
+      if (studentClass) {
+        throw new ConflictException('La clase del estudiante ya existe');
+      }
       const studentClassUpdate = this.studentClassRepository.merge(
         studentClassFound,
         dto,
