@@ -35,22 +35,10 @@ export class ClassService {
   // obtiene clases (admin)
   async getClasses() {
     try {
-      const classes = await this.classRepository
-        .createQueryBuilder('class')
-        .leftJoinAndSelect('class.career', 'career')
-        .leftJoinAndSelect('class.studentsClass', 'studentsClass')
-
-        // solo selecciono solo los nombres de los estudiantes
-        .leftJoin('studentsClass.student', 'student')
-        .addSelect([
-          'student.name',
-          'student.lastName1',
-          'student.lastName2',
-          'student.filename',
-        ])
-
-        .getMany();
-      return classes;
+      return await this.classRepository.find({
+        // relations: ['cycle', 'career', 'course', 'professor', 'studentsClass'],
+        relations: ['career'],
+      });
     } catch (error) {
       throw new InternalServerErrorException('¡Ups! Error interno');
     }
@@ -175,6 +163,25 @@ export class ClassService {
       return await this.studentClassRepository.find({
         relations: ['student', 'classs'],
       });
+    } catch (error) {
+      throw new InternalServerErrorException('¡Ups! Error interno');
+    }
+  }
+
+  // obtiene estudiantes por clase
+  async getStudentsByClassId(classId: number) {
+    try {
+      return await this.studentClassRepository
+        .createQueryBuilder('studentClass')
+        .leftJoin('studentClass.student', 'student')
+        .addSelect([
+          'student.name',
+          'student.lastName1',
+          'student.lastName2',
+          'student.filename',
+        ])
+        .where('studentClass.classId = :classId', { classId })
+        .getMany();
     } catch (error) {
       throw new InternalServerErrorException('¡Ups! Error interno');
     }
