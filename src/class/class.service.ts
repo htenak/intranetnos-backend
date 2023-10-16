@@ -217,7 +217,7 @@ export class ClassService {
         )
         .getOne();
       if (studentClass) {
-        throw new ConflictException('La clase del estudiante ya existe');
+        throw new ConflictException('El estudiante ya está en esta clase');
       }
       return await this.studentClassRepository.save(
         this.studentClassRepository.create(dto),
@@ -243,7 +243,7 @@ export class ClassService {
         )
         .getOne();
       if (studentClass) {
-        throw new ConflictException('La clase del estudiante ya existe');
+        throw new ConflictException('El estudiante ya está en esta clase');
       }
       const studentClassUpdate = this.studentClassRepository.merge(
         studentClassFound,
