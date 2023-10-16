@@ -42,7 +42,12 @@ export class ClassService {
 
         // solo selecciono solo los nombres de los estudiantes
         .leftJoin('studentsClass.student', 'student')
-        .addSelect(['student.name', 'student.lastName1', 'student.lastName2'])
+        .addSelect([
+          'student.name',
+          'student.lastName1',
+          'student.lastName2',
+          'student.filename',
+        ])
 
         .getMany();
       return classes;
