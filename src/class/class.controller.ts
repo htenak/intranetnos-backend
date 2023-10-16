@@ -91,6 +91,14 @@ export class ClassController {
     return { statusCode: HttpStatus.OK, data };
   }
 
+  // obtiene estudiantes por clase
+  @AuthAndRoles(ROLE.admin)
+  @Get('student-classes/classId/:id')
+  async getStudentsByClassId(@Param('id', ParseIntPipe) classId: number) {
+    const data = await this.classService.getStudentsByClassId(classId);
+    return { statusCode: HttpStatus.OK, data };
+  }
+
   // obtiene clase estudiante
   @AuthAndRoles(ROLE.admin)
   @Get('student-classes/:id')
