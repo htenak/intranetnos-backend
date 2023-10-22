@@ -217,6 +217,14 @@ export class AcademicController {
     return { statusCode: HttpStatus.OK, data };
   }
 
+  // obtiene cursos por cycleId
+  @AuthAndRoles(ROLE.admin)
+  @Get('courses/cycleId/:id')
+  async getCoursesByCycleId(@Param('id', ParseIntPipe) cycleId: number) {
+    const data = await this.academicService.getCoursesByCycleId(cycleId);
+    return { statusCode: HttpStatus.OK, data };
+  }
+
   // obtiene curso
   @AuthAndRoles(ROLE.admin)
   @Get('courses/:id')

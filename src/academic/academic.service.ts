@@ -198,6 +198,19 @@ export class AcademicService {
     }
   }
 
+  // obtiene cursos por cycleId
+  async getCoursesByCycleId(cycleId: number) {
+    try {
+      return await this.courseRepository
+        .createQueryBuilder('course')
+        .leftJoin('course.classes', 'class')
+        .where('class.cycleId = :cycleId', { cycleId })
+        .getMany();
+    } catch (error) {
+      throw new InternalServerErrorException('¡Ups! Error interno');
+    }
+  }
+
   // obtiene tipo de curso por id (admin)
   async getCourseTypeById(id: number) {
     try {

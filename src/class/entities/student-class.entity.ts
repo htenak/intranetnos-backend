@@ -26,7 +26,7 @@ export class StudentClass {
   @Column({ type: 'bool', default: true })
   status: boolean;
 
-  @CreateDateColumn({ name: 'created_at', type: 'timestamp', select: false })
+  @CreateDateColumn({ name: 'created_at', type: 'timestamp', select: true })
   createdAt: Date;
 
   @ManyToOne(() => User, (user) => user.studentsClass)

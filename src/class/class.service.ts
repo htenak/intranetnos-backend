@@ -213,7 +213,10 @@ export class ClassService {
         .createQueryBuilder('studentClass')
         .where(
           'studentClass.classId = :classId AND studentClass.studentUserId = :studentUserId',
-          { classId: dto.classId, studentUserId: dto.studentUserId },
+          {
+            classId: dto.classId,
+            studentUserId: dto.studentUserId,
+          },
         )
         .getOne();
       if (studentClass) {
