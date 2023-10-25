@@ -265,9 +265,9 @@ export class AcademicController {
   @Put('courses/status/:id')
   async updateStatusCourse(
     @Param('id', ParseIntPipe) id: number,
-    @Body() status: boolean,
+    @Body() dto: { status: boolean },
   ) {
-    const data = await this.academicService.updateStatusCourse(id, status);
+    const data = await this.academicService.updateStatusCourse(id, dto.status);
     return {
       statusCode: HttpStatus.OK,
       message: 'Se actualizó correctamente',
