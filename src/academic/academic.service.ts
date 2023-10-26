@@ -165,9 +165,7 @@ export class AcademicService {
     } catch (error) {
       if (error instanceof HttpException) throw error;
       if (error.code === 'ER_DUP_ENTRY') {
-        throw new ConflictException(
-          'El nombre y/o descripción de la carrera ya existen',
-        );
+        throw new ConflictException('El nombre y/o descripción ya existen');
       }
       throw new InternalServerErrorException('¡Ups! Error interno');
     }
@@ -316,7 +314,10 @@ export class AcademicService {
           throw new ConflictException('La abreviación del curso ya existe');
         }
       }
-      return this.courseRepository.save(this.courseRepository.create(dto));
+      const newSaved = await this.courseRepository.save(
+        this.courseRepository.create(dto),
+      );
+      return await this.getCourseById(newSaved.id);
     } catch (error) {
       if (error instanceof HttpException) throw error;
       throw new InternalServerErrorException('¡Ups! Error interno');
