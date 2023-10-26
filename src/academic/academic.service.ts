@@ -146,7 +146,7 @@ export class AcademicService {
         )
         .getOne();
       if (cycle) {
-        throw new ConflictException('El nombre y/o descripción ya existen');
+        throw new ConflictException('Abreviación y/o descripción ya existen');
       }
       return this.cycleRepository.save(this.cycleRepository.create(dto));
     } catch (error) {
@@ -165,7 +165,7 @@ export class AcademicService {
     } catch (error) {
       if (error instanceof HttpException) throw error;
       if (error.code === 'ER_DUP_ENTRY') {
-        throw new ConflictException('El nombre y/o descripción ya existen');
+        throw new ConflictException('Abreviación y/o descripción ya existen');
       }
       throw new InternalServerErrorException('¡Ups! Error interno');
     }
