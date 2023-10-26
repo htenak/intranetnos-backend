@@ -83,7 +83,10 @@ export class ClassService {
         )
         .getOne();
       if (classs) throw new ConflictException('La clase ya existe');
-      return await this.classRepository.save(this.classRepository.create(dto));
+      const newSaved = await this.classRepository.save(
+        this.classRepository.create(dto),
+      );
+      return await this.getClassById(newSaved.id);
     } catch (error) {
       if (error instanceof HttpException) throw error;
       throw new InternalServerErrorException('¡Ups! Error interno');
@@ -222,9 +225,10 @@ export class ClassService {
       if (studentClass) {
         throw new ConflictException('El estudiante ya está en esta clase');
       }
-      return await this.studentClassRepository.save(
+      const newSaved = await this.studentClassRepository.save(
         this.studentClassRepository.create(dto),
       );
+      return await this.getStudentClassById(newSaved.id);
     } catch (error) {
       if (error instanceof HttpException) throw error;
       throw new InternalServerErrorException('¡Ups! Error interno');
