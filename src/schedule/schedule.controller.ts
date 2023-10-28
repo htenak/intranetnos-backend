@@ -59,7 +59,7 @@ export class ScheduleController {
     const data = await this.scheduleService.createSchedule(dto);
     return {
       statusCode: HttpStatus.OK,
-      message: 'Se registró el horarió',
+      message: 'Se registró el horario',
       data,
     };
   }
@@ -74,7 +74,7 @@ export class ScheduleController {
     const data = await this.scheduleService.updateSchedule(id, dto);
     return {
       statusCode: HttpStatus.OK,
-      message: 'Se actualizó el horarió',
+      message: 'Se actualizó el horario',
       data,
     };
   }

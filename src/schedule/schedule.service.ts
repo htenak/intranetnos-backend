@@ -73,7 +73,9 @@ export class ScheduleService {
   // obtiene horarios (admin)
   async getSchedules() {
     try {
-      return await this.scheduleRepository.find();
+      return await this.scheduleRepository.find({
+        relations: ['day', 'classs'],
+      });
     } catch (error) {
       throw new InternalServerErrorException('¡Ups! Error interno');
     }
@@ -84,8 +86,7 @@ export class ScheduleService {
     try {
       const schedule = await this.scheduleRepository.findOne({
         where: { id },
-        relations: ['classs', 'classs.career', 'day'],
-        // agregar mas relaciones segun necesidad
+        relations: ['day', 'classs'],
       });
       if (!schedule) throw new NotFoundException('El horario no existe');
       return schedule;
@@ -100,9 +101,13 @@ export class ScheduleService {
     try {
       await this.getDayById(dto.dayId); //valida que el día exista
       await this.classService.getClassById(dto.classId); //valida que la clase exista
-      return await this.scheduleRepository.save(
+
+      // (PENDIENTE) validar si el horario ya existe
+
+      const newSaved = await this.scheduleRepository.save(
         this.scheduleRepository.create(dto),
       );
+      return await this.getScheduleById(newSaved.id);
     } catch (error) {
       if (error instanceof HttpException) throw error;
       throw new InternalServerErrorException('¡Ups! Error interno');
@@ -124,6 +129,9 @@ export class ScheduleService {
         const newClass = await this.classService.getClassById(dto.classId);
         scheduleUpdate.classs = newClass;
       }
+
+      // (PENDIENTE) validar si el horario ya existe
+
       return await this.scheduleRepository.save(scheduleUpdate);
     } catch (error) {
       if (error instanceof HttpException) throw error;
