@@ -101,9 +101,22 @@ export class ScheduleService {
     try {
       await this.getDayById(dto.dayId); //valida que el día exista
       await this.classService.getClassById(dto.classId); //valida que la clase exista
-
-      // (PENDIENTE) validar si el horario ya existe
-
+      const schedule = await this.scheduleRepository
+        .createQueryBuilder('sch')
+        .where(
+          `sch.startTime = :startTime AND
+           sch.endTime = :endTime AND
+           sch.dayId = :dayId AND
+           sch.classId = :classId`,
+          {
+            startTime: dto.startTime,
+            endTime: dto.endTime,
+            dayId: dto.dayId,
+            classId: dto.classId,
+          },
+        )
+        .getOne();
+      if (schedule) throw new ConflictException('El horario ya existe');
       const newSaved = await this.scheduleRepository.save(
         this.scheduleRepository.create(dto),
       );
@@ -118,6 +131,25 @@ export class ScheduleService {
   async updateSchedule(id: number, dto: UpdateScheduleDto) {
     try {
       const scheduleFound = await this.getScheduleById(id);
+      // verifico si el horario ya existe
+      const schedule = await this.scheduleRepository
+        .createQueryBuilder('sch')
+        .where(
+          `sch.id != :id AND
+           sch.startTime = :startTime AND
+           sch.endTime = :endTime AND
+           sch.dayId = :dayId AND
+           sch.classId = :classId`,
+          {
+            id,
+            startTime: dto.startTime,
+            endTime: dto.endTime,
+            dayId: dto.dayId,
+            classId: dto.classId,
+          },
+        )
+        .getOne();
+      if (schedule) throw new ConflictException('El horario ya existe');
       const scheduleUpdate = this.scheduleRepository.merge(scheduleFound, dto);
       // si se cambia día
       if (dto.dayId) {
@@ -129,9 +161,6 @@ export class ScheduleService {
         const newClass = await this.classService.getClassById(dto.classId);
         scheduleUpdate.classs = newClass;
       }
-
-      // (PENDIENTE) validar si el horario ya existe
-
       return await this.scheduleRepository.save(scheduleUpdate);
     } catch (error) {
       if (error instanceof HttpException) throw error;
