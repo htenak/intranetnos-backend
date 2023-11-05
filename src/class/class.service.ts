@@ -290,9 +290,10 @@ export class ClassService {
   // obtiene clases según profesor (professor)
   async getClassesProfessor(professorUserId: number) {
     try {
-      // await this.academicService.getProfessorById(professorUserId);
+      await this.academicService.getProfessorById(professorUserId);
       const classes = await this.classRepository.find({
         where: { professorUserId },
+        relations: ['cycle', 'career', 'course'],
       });
       return classes;
     } catch (error) {
@@ -303,7 +304,7 @@ export class ClassService {
   // obtiene clase según profesor (professor)
   async getClassProfessorById(professorUserId: number, id: number) {
     try {
-      // await this.academicService.getProfessorById(professorUserId);
+      await this.academicService.getProfessorById(professorUserId);
       const classs = await this.classRepository.findOne({
         where: { id, professorUserId },
       });
