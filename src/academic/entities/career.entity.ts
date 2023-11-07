@@ -7,6 +7,7 @@ import {
 } from 'typeorm';
 import { Course } from './course.entity';
 import { Class } from 'src/class/entities';
+import { ClassroomCareer } from './classroom-career.entity';
 
 @Entity('careers')
 export class Career {
@@ -27,4 +28,7 @@ export class Career {
 
   @OneToMany(() => Class, (classs) => classs.career)
   classes: Class[];
+
+  @OneToMany(() => ClassroomCareer, (classroomCareer) => classroomCareer.career)
+  classroomsCareer: ClassroomCareer[];
 }
