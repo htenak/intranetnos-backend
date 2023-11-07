@@ -188,6 +188,7 @@ export class ScheduleService {
       await this.classService.getClassById(classId);
       return await this.scheduleRepository
         .createQueryBuilder('sch')
+        .leftJoinAndSelect('sch.day', 'day')
         .where('sch.classId = :classId', { classId })
         .getMany();
     } catch (error) {
