@@ -10,5 +10,6 @@ import { ClassModule } from 'src/class/class.module';
   imports: [TypeOrmModule.forFeature([Day, Schedule]), ClassModule],
   providers: [ScheduleService, DayInitializerProvider],
   controllers: [ScheduleController],
+  exports: [ScheduleService],
 })
 export class ScheduleModule {}

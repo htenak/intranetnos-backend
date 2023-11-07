@@ -181,4 +181,18 @@ export class ScheduleService {
       throw new InternalServerErrorException('¡Ups! Error interno');
     }
   }
+
+  // obtiene horario(s) por classId (profesor)
+  async getSchedulesByClassId(classId: number) {
+    try {
+      await this.classService.getClassById(classId);
+      return await this.scheduleRepository
+        .createQueryBuilder('sch')
+        .where('sch.classId = :classId', { classId })
+        .getMany();
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      throw new InternalServerErrorException('¡Ups! Error interno');
+    }
+  }
 }

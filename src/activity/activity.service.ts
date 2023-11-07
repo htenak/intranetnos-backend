@@ -1,11 +1,9 @@
 import {
   ConflictException,
   HttpException,
-  Inject,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
-  forwardRef,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Activity, ActivityType } from './entities';

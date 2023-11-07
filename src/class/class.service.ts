@@ -316,4 +316,33 @@ export class ClassService {
       throw new InternalServerErrorException('¡Ups! Error interno');
     }
   }
+
+  // obtiene todas las otras clases de otros profesores con mas detalles (profesor)
+  async getOtherClassesProfessores() {
+    try {
+      const classes = await this.classRepository
+        .createQueryBuilder('class')
+        .leftJoin('class.career', 'career')
+        .leftJoin('class.cycle', 'cycle')
+        .leftJoin('class.course', 'course')
+        .leftJoin('class.professor', 'professor')
+        .select([
+          'class.id',
+          'career.name',
+          'cycle.abbreviation',
+          'cycle.description',
+          'course.name',
+          'professor.name',
+          'professor.lastName1',
+          'professor.lastName2',
+          'professor.dni',
+          'professor.filename',
+        ])
+        .getMany();
+      return classes;
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      throw new InternalServerErrorException('¡Ups! Error interno');
+    }
+  }
 }
