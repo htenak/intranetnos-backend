@@ -15,10 +15,12 @@ import { AuthAndRoles } from 'src/common/decorators';
 import { ROLE } from 'src/config/constants';
 import {
   CreateCareerDto,
+  CreateClassroomDto,
   CreateCourseDto,
   CreateCourseTypeDto,
   CreateCycleDto,
   UpdateCareerDto,
+  UpdateClassroomDto,
   UpdateCourseDto,
   UpdateCourseTypeDto,
   UpdateCycleDto,
@@ -80,6 +82,64 @@ export class AcademicController {
   @Delete('careers/:id')
   async deleteCareer(@Param('id', ParseIntPipe) id: number) {
     const data = await this.academicService.deleteCareer(id);
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Se eliminó el registro',
+      data,
+    };
+  }
+
+  /**
+   * RUTAS AULAS:
+   */
+
+  // obtiene carreras
+  @AuthAndRoles(ROLE.admin)
+  @Get('classrooms')
+  async getClassrooms() {
+    const data = await this.academicService.getClassrooms();
+    return { statusCode: HttpStatus.OK, data };
+  }
+
+  // obtiene carrera
+  @AuthAndRoles(ROLE.admin)
+  @Get('classrooms/:id')
+  async getClassroom(@Param('id', ParseIntPipe) id: number) {
+    const data = await this.academicService.getClassroomById(id);
+    return { statusCode: HttpStatus.OK, data };
+  }
+
+  // crea carrera
+  @AuthAndRoles(ROLE.admin)
+  @Post('classrooms/')
+  async createClassroom(@Body() dto: CreateClassroomDto) {
+    const data = await this.academicService.createClassroom(dto);
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Se registró exitosamente',
+      data,
+    };
+  }
+
+  // actualiza carrera
+  @AuthAndRoles(ROLE.admin)
+  @Put('classrooms/:id')
+  async updateClassroom(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateClassroomDto,
+  ) {
+    const data = await this.academicService.updateClassroom(id, dto);
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Se actualizó correctamente',
+      data,
+    };
+  }
+
+  @AuthAndRoles(ROLE.admin)
+  @Delete('classrooms/:id')
+  async deleteClassroom(@Param('id', ParseIntPipe) id: number) {
+    const data = await this.academicService.deleteClassroom(id);
     return {
       statusCode: HttpStatus.OK,
       message: 'Se eliminó el registro',
