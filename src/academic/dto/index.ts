@@ -1,5 +1,7 @@
 export * from './create-career.dto';
 export * from './update-career.dto';
+export * from './create-classroom.dto';
+export * from './update-classroom.dto';
 export * from './create-cycle.dto';
 export * from './update-cycle.dto';
 export * from './create-course-type.dto';
