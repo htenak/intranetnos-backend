@@ -15,7 +15,7 @@ export class Classroom {
   @Column({ type: 'int', unique: true, nullable: false })
   number: number;
 
-  @Column({ type: 'varchar', unique: true, nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   description: string;
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamp', select: false })

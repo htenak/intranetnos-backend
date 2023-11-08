@@ -9,13 +9,15 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Career, Course, CourseType, Cycle } from './entities';
+import { Career, Classroom, Course, CourseType, Cycle } from './entities';
 import {
   CreateCareerDto,
+  CreateClassroomDto,
   CreateCourseDto,
   CreateCourseTypeDto,
   CreateCycleDto,
   UpdateCareerDto,
+  UpdateClassroomDto,
   UpdateCourseDto,
   UpdateCourseTypeDto,
   UpdateCycleDto,
@@ -29,6 +31,8 @@ export class AcademicService {
   constructor(
     @InjectRepository(Career)
     private readonly careerRepository: Repository<Career>,
+    @InjectRepository(Classroom)
+    private readonly classroomRepository: Repository<Classroom>,
     @InjectRepository(Cycle)
     private readonly cycleRepository: Repository<Cycle>,
     @InjectRepository(CourseType)
@@ -91,7 +95,7 @@ export class AcademicService {
     } catch (error) {
       if (error instanceof HttpException) throw error;
       if (error.code === 'ER_DUP_ENTRY') {
-        throw new ConflictException('El nombre del curso ya existe');
+        throw new ConflictException('El nombre de la carrera ya existe');
       }
       throw new InternalServerErrorException('¡Ups! Error interno');
     }
@@ -102,6 +106,78 @@ export class AcademicService {
     try {
       const career = await this.getCareerById(id);
       return await this.careerRepository.remove(career);
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      if (error.code === 'ER_ROW_IS_REFERENCED_2') {
+        throw new ConflictException('¡Denegado! Registro en uso');
+      }
+      throw new InternalServerErrorException('¡Ups! Error interno');
+    }
+  }
+
+  // obtiene carreras (admin)
+  async getClassrooms() {
+    try {
+      return await this.classroomRepository.find({ relations: [] });
+    } catch (error) {
+      throw new InternalServerErrorException('¡Ups! Error interno');
+    }
+  }
+
+  // obtiene carrera por id (admin)
+  async getClassroomById(id: number) {
+    try {
+      const classroom = await this.classroomRepository.findOne({
+        where: { id },
+        relations: [],
+      });
+      if (!classroom) throw new NotFoundException('El aula no existe');
+      return classroom;
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      throw new InternalServerErrorException('¡Ups! Error interno');
+    }
+  }
+
+  // crear carrera (admin)
+  async createClassroom(dto: CreateClassroomDto) {
+    try {
+      const classroom = await this.classroomRepository.findOneBy({
+        number: dto.number,
+      });
+      if (classroom) {
+        throw new ConflictException('El número de aula ya existe');
+      }
+      return this.classroomRepository.save(
+        this.classroomRepository.create(dto),
+      );
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      throw new InternalServerErrorException('¡Ups! Error interno');
+    }
+  }
+
+  // actualizar carrera (admin)
+  async updateClassroom(id: number, dto: UpdateClassroomDto) {
+    try {
+      const classroomFound = await this.getClassroomById(id);
+      return await this.classroomRepository.save(
+        this.classroomRepository.merge(classroomFound, dto),
+      );
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      if (error.code === 'ER_DUP_ENTRY') {
+        throw new ConflictException('El número de aula ya existe');
+      }
+      throw new InternalServerErrorException('¡Ups! Error interno');
+    }
+  }
+
+  // eliminar carrera (admin)
+  async deleteClassroom(id: number) {
+    try {
+      const classroom = await this.getClassroomById(id);
+      return await this.classroomRepository.remove(classroom);
     } catch (error) {
       if (error instanceof HttpException) throw error;
       if (error.code === 'ER_ROW_IS_REFERENCED_2') {
