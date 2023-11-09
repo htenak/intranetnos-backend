@@ -102,10 +102,10 @@ export class ClassService {
         .createQueryBuilder('class')
         .where(
           `class.id != :id AND
-              class.cycleId = :cycleId AND 
-              class.careerId = :careerId AND 
-              class.courseId = :courseId AND 
-              class.professorUserId = :professorUserId`,
+            class.cycleId = :cycleId AND 
+            class.careerId = :careerId AND 
+            class.courseId = :courseId AND 
+            class.professorUserId = :professorUserId`,
           {
             id,
             cycleId: dto.cycleId,
@@ -328,6 +328,7 @@ export class ClassService {
         .leftJoin('class.professor', 'professor')
         .select([
           'class.id',
+          'class.status',
           'career.name',
           'cycle.abbreviation',
           'cycle.description',
