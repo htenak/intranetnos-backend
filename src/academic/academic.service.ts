@@ -9,14 +9,23 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Career, Classroom, Course, CourseType, Cycle } from './entities';
+import {
+  Career,
+  Classroom,
+  ClassroomCareer,
+  Course,
+  CourseType,
+  Cycle,
+} from './entities';
 import {
   CreateCareerDto,
   CreateClassroomDto,
+  CreateClassroomCareerDto,
   CreateCourseDto,
   CreateCourseTypeDto,
   CreateCycleDto,
   UpdateCareerDto,
+  UpdateClassroomCareerDto,
   UpdateClassroomDto,
   UpdateCourseDto,
   UpdateCourseTypeDto,
@@ -33,6 +42,8 @@ export class AcademicService {
     private readonly careerRepository: Repository<Career>,
     @InjectRepository(Classroom)
     private readonly classroomRepository: Repository<Classroom>,
+    @InjectRepository(ClassroomCareer)
+    private readonly classroomCareerRepository: Repository<ClassroomCareer>,
     @InjectRepository(Cycle)
     private readonly cycleRepository: Repository<Cycle>,
     @InjectRepository(CourseType)
@@ -61,7 +72,7 @@ export class AcademicService {
     try {
       const career = await this.careerRepository.findOne({
         where: { id },
-        relations: ['courses'],
+        relations: [],
       });
       if (!career) throw new NotFoundException('La carrera no existe');
       return career;
@@ -178,6 +189,109 @@ export class AcademicService {
     try {
       const classroom = await this.getClassroomById(id);
       return await this.classroomRepository.remove(classroom);
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      if (error.code === 'ER_ROW_IS_REFERENCED_2') {
+        throw new ConflictException('¡Denegado! Registro en uso');
+      }
+      throw new InternalServerErrorException('¡Ups! Error interno');
+    }
+  }
+
+  // obtiene aulas de carreras (admin)
+  async getClassroomsCareers() {
+    try {
+      return await this.classroomCareerRepository.find({
+        relations: [],
+      });
+    } catch (error) {
+      throw new InternalServerErrorException('¡Ups! Error interno');
+    }
+  }
+
+  // obtiene aula de carrera (admin)
+  async getClassroomCareerById(id: number) {
+    try {
+      const cc = await this.classroomCareerRepository.findOne({
+        where: { id },
+        relations: [],
+      });
+      if (!cc) throw new NotFoundException('El aula de la carrera no existe');
+      return cc;
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      throw new InternalServerErrorException('¡Ups! Error interno');
+    }
+  }
+
+  // crea aula de carrera (admin)
+  async createClassroomCareer(dto: CreateClassroomCareerDto) {
+    try {
+      await this.getCareerById(dto.careerId);
+      await this.getClassroomById(dto.classroomId);
+      const cc = await this.classroomCareerRepository
+        .createQueryBuilder('cc')
+        .where(`cc.classroomId = :classroomId AND cc.careerId = :careerId`, {
+          classroomId: dto.classroomId,
+          careerId: dto.careerId,
+        })
+        .getOne();
+      if (cc) throw new ConflictException('El aula de la carrera ya existe');
+      const newSaved = await this.classroomCareerRepository.save(
+        this.classroomCareerRepository.create(dto),
+      );
+      return await this.getClassroomCareerById(newSaved.id);
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      throw new InternalServerErrorException('¡Ups! Error interno');
+    }
+  }
+
+  // actualiza aula de carrera (admin)
+  async updateClassroomCareer(id: number, dto: UpdateClassroomCareerDto) {
+    try {
+      const ccFound = await this.getClassroomCareerById(id);
+      // primero verifico si el aula de la carrera ya existe
+      const cc = await this.classroomCareerRepository
+        .createQueryBuilder('cc')
+        .where(
+          `cc.id != :id AND
+            cc.classroomId = :classroomId AND 
+            cc.careerId = :careerId`,
+          {
+            id,
+            classroomId: dto.classroomId,
+            careerId: dto.careerId,
+          },
+        )
+        .getOne();
+      if (cc) throw new ConflictException('El aula de la carrera ya existe');
+      const ccUpdate = this.classroomCareerRepository.merge(ccFound, dto);
+      if (dto.classroomId) {
+        const newClassroom = await this.getClassroomById(dto.classroomId);
+        ccUpdate.classroom = newClassroom;
+      }
+      if (dto.careerId) {
+        const newCareer = await this.getCareerById(dto.careerId);
+        ccUpdate.career = newCareer;
+      }
+      return await this.classroomCareerRepository.save(ccUpdate);
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      if (error.code === 'ER_DUP_ENTRY') {
+        throw new ConflictException(
+          'El nombre y/o abreviación del curso ya existen',
+        );
+      }
+      throw new InternalServerErrorException('¡Ups! Error interno');
+    }
+  }
+
+  // elimina aula de carrera (admin)
+  async deleteClassroomCareer(id: number) {
+    try {
+      const cc = await this.getClassroomCareerById(id);
+      return await this.classroomCareerRepository.remove(cc);
     } catch (error) {
       if (error instanceof HttpException) throw error;
       if (error.code === 'ER_ROW_IS_REFERENCED_2') {

@@ -15,11 +15,13 @@ import { AuthAndRoles } from 'src/common/decorators';
 import { ROLE } from 'src/config/constants';
 import {
   CreateCareerDto,
+  CreateClassroomCareerDto,
   CreateClassroomDto,
   CreateCourseDto,
   CreateCourseTypeDto,
   CreateCycleDto,
   UpdateCareerDto,
+  UpdateClassroomCareerDto,
   UpdateClassroomDto,
   UpdateCourseDto,
   UpdateCourseTypeDto,
@@ -93,7 +95,7 @@ export class AcademicController {
    * RUTAS AULAS:
    */
 
-  // obtiene carreras
+  // obtiene aulas
   @AuthAndRoles(ROLE.admin)
   @Get('classrooms')
   async getClassrooms() {
@@ -101,7 +103,7 @@ export class AcademicController {
     return { statusCode: HttpStatus.OK, data };
   }
 
-  // obtiene carrera
+  // obtiene aula
   @AuthAndRoles(ROLE.admin)
   @Get('classrooms/:id')
   async getClassroom(@Param('id', ParseIntPipe) id: number) {
@@ -109,7 +111,7 @@ export class AcademicController {
     return { statusCode: HttpStatus.OK, data };
   }
 
-  // crea carrera
+  // crea aula
   @AuthAndRoles(ROLE.admin)
   @Post('classrooms/')
   async createClassroom(@Body() dto: CreateClassroomDto) {
@@ -121,7 +123,7 @@ export class AcademicController {
     };
   }
 
-  // actualiza carrera
+  // actualiza aula
   @AuthAndRoles(ROLE.admin)
   @Put('classrooms/:id')
   async updateClassroom(
@@ -136,10 +138,70 @@ export class AcademicController {
     };
   }
 
+  // elimina aula
   @AuthAndRoles(ROLE.admin)
   @Delete('classrooms/:id')
   async deleteClassroom(@Param('id', ParseIntPipe) id: number) {
     const data = await this.academicService.deleteClassroom(id);
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Se eliminó el registro',
+      data,
+    };
+  }
+
+  /**
+   * RUTAS AULAS DE CARRERAS:
+   */
+
+  // obtiene aulas de carrera
+  @AuthAndRoles(ROLE.admin)
+  @Get('classrooms-careers')
+  async getClassroomsCareers() {
+    const data = await this.academicService.getClassroomsCareers();
+    return { statusCode: HttpStatus.OK, data };
+  }
+
+  // obtiene aula de carrera
+  @AuthAndRoles(ROLE.admin)
+  @Get('classrooms-careers/:id')
+  async getClassroomCareer(@Param('id', ParseIntPipe) id: number) {
+    const data = await this.academicService.getClassroomCareerById(id);
+    return { statusCode: HttpStatus.OK, data };
+  }
+
+  // crea aula de carrera
+  @AuthAndRoles(ROLE.admin)
+  @Post('classrooms-careers/')
+  async createClassroomCareer(@Body() dto: CreateClassroomCareerDto) {
+    const data = await this.academicService.createClassroomCareer(dto);
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Se registró exitosamente',
+      data,
+    };
+  }
+
+  // actualiza aula de carrera
+  @AuthAndRoles(ROLE.admin)
+  @Put('classrooms-careers/:id')
+  async updateClassroomCareer(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateClassroomCareerDto,
+  ) {
+    const data = await this.academicService.updateClassroomCareer(id, dto);
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Se actualizó correctamente',
+      data,
+    };
+  }
+
+  // elimina aula de carrera
+  @AuthAndRoles(ROLE.admin)
+  @Delete('classrooms-careers/:id')
+  async deleteClassroomCareer(@Param('id', ParseIntPipe) id: number) {
+    const data = await this.academicService.deleteClassroomCareer(id);
     return {
       statusCode: HttpStatus.OK,
       message: 'Se eliminó el registro',

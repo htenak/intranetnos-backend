@@ -9,7 +9,7 @@ import {
 import { Classroom } from './classroom.entity';
 import { Career } from './career.entity';
 
-@Entity('classrooms_career')
+@Entity('classrooms_careers')
 export class ClassroomCareer {
   @PrimaryGeneratedColumn()
   id: number;
@@ -21,7 +21,7 @@ export class ClassroomCareer {
   careerId: number;
 
   @Column({ type: 'varchar', nullable: false })
-  denomination: number;
+  denomination: string;
 
   @Column({ type: 'bool', default: true })
   status: boolean;
