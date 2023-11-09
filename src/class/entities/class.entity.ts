@@ -30,11 +30,7 @@ export class Class {
   @Column({ name: 'professor_user_id', nullable: false })
   professorUserId: number;
 
-  @Column({
-    name: 'denomination',
-    type: 'varchar',
-    nullable: false,
-  })
+  @Column({ type: 'varchar', nullable: false })
   denomination: string;
 
   @Column({ type: 'bool', default: true })
