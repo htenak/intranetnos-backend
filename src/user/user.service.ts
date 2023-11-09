@@ -210,7 +210,7 @@ export class UserService {
     try {
       const person = await this.userRepository.findOne({
         where: { id, roleId },
-        relations: ['role', 'classes', 'studentsClass', 'studentsClass.classs'],
+        relations: ['role'],
         //añadir más relaciones segun necesidad ya sea estudiante o professor
       });
       if (!person) throw new NotFoundException('Usuario no encontrado');
