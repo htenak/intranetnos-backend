@@ -11,7 +11,7 @@ export const renameImage = (req: any, file: any, callback: any) => {
 };
 
 export const fileFilter = (req: any, file: any, callback: any) => {
-  if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+  if (!file.originalname.match(/\.(jpg|jpeg|png|webp)$/)) {
     callback(new BadRequestException('El tipo de imagen no es válido'), false);
   } else {
     callback(null, true);
