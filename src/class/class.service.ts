@@ -65,6 +65,7 @@ export class ClassService {
     try {
       await this.academicService.getCycleById(dto.cycleId);
       await this.academicService.getCareerById(dto.careerId);
+      await this.academicService.getClassroomCareerById(dto.classroomCareerId);
       await this.academicService.getCourseById(dto.courseId);
       await this.academicService.getProfessorById(dto.professorUserId);
       const classs = await this.classRepository
@@ -72,11 +73,13 @@ export class ClassService {
         .where(
           `class.cycleId = :cycleId AND 
            class.careerId = :careerId AND 
+           class.classroomCareerId = :classroomCareerId AND 
            class.courseId = :courseId AND 
            class.professorUserId = :professorUserId`,
           {
             cycleId: dto.cycleId,
             careerId: dto.careerId,
+            classroomCareerId: dto.classroomCareerId,
             courseId: dto.courseId,
             professorUserId: dto.professorUserId,
           },
@@ -104,12 +107,14 @@ export class ClassService {
           `class.id != :id AND
             class.cycleId = :cycleId AND 
             class.careerId = :careerId AND 
+            class.classroomCareerId = :classroomCareerId AND 
             class.courseId = :courseId AND 
             class.professorUserId = :professorUserId`,
           {
             id,
             cycleId: dto.cycleId,
             careerId: dto.careerId,
+            classroomCareerId: dto.classroomCareerId,
             courseId: dto.courseId,
             professorUserId: dto.professorUserId,
           },
@@ -126,6 +131,12 @@ export class ClassService {
           dto.careerId,
         );
         classUpdate.career = newCareer;
+      }
+      if (dto.classroomCareerId) {
+        const newCC = await this.academicService.getClassroomCareerById(
+          dto.classroomCareerId,
+        );
+        classUpdate.classroomCareer = newCC;
       }
       if (dto.courseId) {
         const newCourse = await this.academicService.getCourseById(
@@ -317,26 +328,22 @@ export class ClassService {
     }
   }
 
-  // obtiene todas las otras clases de otros profesores con mas detalles (profesor)
-  async getOtherClassesProfessores() {
+  // obtiene todas las clases con datos del profesor
+  async getAllClassesWithProfessor() {
     try {
       const classes = await this.classRepository
         .createQueryBuilder('class')
         .leftJoin('class.career', 'career')
-        .leftJoin('class.cycle', 'cycle')
-        .leftJoin('class.course', 'course')
         .leftJoin('class.professor', 'professor')
         .select([
           'class.id',
+          'class.denomination',
           'class.status',
           'career.name',
-          'cycle.abbreviation',
-          'cycle.description',
-          'course.name',
           'professor.name',
+          'professor.email',
           'professor.lastName1',
           'professor.lastName2',
-          'professor.dni',
           'professor.filename',
         ])
         .getMany();
