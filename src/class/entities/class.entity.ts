@@ -1,4 +1,4 @@
-import { Career, Course, Cycle } from 'src/academic/entities';
+import { Career, ClassroomCareer, Course, Cycle } from 'src/academic/entities';
 import { Schedule } from 'src/schedule/entities';
 import { User } from 'src/user/entities';
 import {
@@ -30,8 +30,14 @@ export class Class {
   @Column({ name: 'professor_user_id', nullable: false })
   professorUserId: number;
 
+  @Column({ name: 'classroom_career_id', nullable: false })
+  classroomCareerId: number;
+
   @Column({ type: 'varchar', nullable: false })
   denomination: string;
+
+  @Column({ type: 'varchar', nullable: true })
+  filename: string;
 
   @Column({ type: 'bool', default: true })
   status: boolean;
@@ -55,12 +61,16 @@ export class Class {
   @JoinColumn({ name: 'professor_user_id' })
   professor: User;
 
+  @ManyToOne(() => ClassroomCareer, (cc) => cc.classes)
+  @JoinColumn({ name: 'classroom_career_id' })
+  classroomCareer: ClassroomCareer;
+
   @OneToMany(() => Schedule, (schedule) => schedule.classs)
   schedules: Schedule[];
 
   @OneToMany(() => StudentClass, (studentClass) => studentClass.classs)
   studentsClass: StudentClass[];
 
-  @OneToMany(() => Activity, (activity) => activity.classId)
+  @OneToMany(() => Activity, (activity) => activity.classs)
   avtivities: Activity[];
 }
