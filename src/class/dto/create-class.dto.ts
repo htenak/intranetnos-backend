@@ -9,6 +9,10 @@ export class CreateClassDto {
   @Min(1, { message: 'El numero identificador de la carrera es inválido' })
   careerId: number;
 
+  @IsNumber({}, { message: 'El identificador del aula debe ser número' })
+  @Min(1, { message: 'El numero identificador del aula es inválido' })
+  classroomCareerId: number;
+
   @IsNumber({}, { message: 'El identificador del curso debe ser número' })
   @Min(1, { message: 'El numero identificador del curso es inválido' })
   courseId: number;
