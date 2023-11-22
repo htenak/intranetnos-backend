@@ -61,7 +61,9 @@ export class AcademicService {
   // obtiene carreras (admin)
   async getCareers() {
     try {
-      return await this.careerRepository.find({ relations: ['courses'] });
+      return await this.careerRepository.find({
+        relations: ['courses', 'classroomsCareer'],
+      });
     } catch (error) {
       throw new InternalServerErrorException('¡Ups! Error interno');
     }
@@ -202,7 +204,19 @@ export class AcademicService {
   async getClassroomsCareers() {
     try {
       return await this.classroomCareerRepository.find({
-        relations: [],
+        relations: ['classroom', 'career'],
+      });
+    } catch (error) {
+      throw new InternalServerErrorException('¡Ups! Error interno');
+    }
+  }
+
+  // obtiene aulas de carrera por careerId
+  async getClassrooomsCareerByCareerId(careerId: number) {
+    try {
+      return await this.classroomCareerRepository.find({
+        relations: ['classroom', 'career'],
+        where: { careerId },
       });
     } catch (error) {
       throw new InternalServerErrorException('¡Ups! Error interno');
@@ -214,7 +228,7 @@ export class AcademicService {
     try {
       const cc = await this.classroomCareerRepository.findOne({
         where: { id },
-        relations: [],
+        relations: ['classroom', 'career'],
       });
       if (!cc) throw new NotFoundException('El aula de la carrera no existe');
       return cc;
@@ -227,8 +241,8 @@ export class AcademicService {
   // crea aula de carrera (admin)
   async createClassroomCareer(dto: CreateClassroomCareerDto) {
     try {
-      await this.getCareerById(dto.careerId);
-      await this.getClassroomById(dto.classroomId);
+      const career = await this.getCareerById(dto.careerId);
+      const clasroom = await this.getClassroomById(dto.classroomId);
       const cc = await this.classroomCareerRepository
         .createQueryBuilder('cc')
         .where(`cc.classroomId = :classroomId AND cc.careerId = :careerId`, {
@@ -237,8 +251,13 @@ export class AcademicService {
         })
         .getOne();
       if (cc) throw new ConflictException('El aula de la carrera ya existe');
+
+      const createdCC = {
+        ...dto,
+        denomination: `Aula N° ${clasroom.number} - ${career.name}`,
+      };
       const newSaved = await this.classroomCareerRepository.save(
-        this.classroomCareerRepository.create(dto),
+        this.classroomCareerRepository.create(createdCC),
       );
       return await this.getClassroomCareerById(newSaved.id);
     } catch (error) {

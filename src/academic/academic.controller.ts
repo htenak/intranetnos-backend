@@ -162,6 +162,18 @@ export class AcademicController {
     return { statusCode: HttpStatus.OK, data };
   }
 
+  // obtiene aulas de carrea por careerId
+  @AuthAndRoles(ROLE.admin)
+  @Get('classrooms-careers/careerId/:id')
+  async getClassrooomsCareerByCareerId(
+    @Param('id', ParseIntPipe) careerId: number,
+  ) {
+    const data = await this.academicService.getClassrooomsCareerByCareerId(
+      careerId,
+    );
+    return { statusCode: HttpStatus.OK, data };
+  }
+
   // obtiene aula de carrera
   @AuthAndRoles(ROLE.admin)
   @Get('classrooms-careers/:id')

@@ -10,11 +10,4 @@ export class CreateClassroomCareerDto {
   )
   @Min(1, { message: 'El identificador de la carrera es inválido' })
   careerId: number;
-
-  @IsString({ message: 'La denominación de aula de la carrera debe ser texto' })
-  @MinLength(1, {
-    message:
-      'La denominación de aula de la carrera debe tener al menos un caracter',
-  })
-  denomination: string;
 }
