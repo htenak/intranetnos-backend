@@ -329,11 +329,16 @@ export class ClassService {
   }
 
   // obtiene todas las clases con datos del profesor
-  async getAllClassesWithProfessor() {
+  async getAllClassesAndFilters(parameters: number[]) {
+    const careerId = parameters[0];
+    const cycleId = parameters[1];
+    const professorId = parameters[2];
+
     try {
-      const classes = await this.classRepository
+      const query = this.classRepository
         .createQueryBuilder('class')
         .leftJoin('class.career', 'career')
+        .leftJoin('class.cycle', 'cycle')
         .leftJoin('class.professor', 'professor')
         .select([
           'class.id',
@@ -345,11 +350,22 @@ export class ClassService {
           'professor.lastName1',
           'professor.lastName2',
           'professor.filename',
-        ])
-        .getMany();
-      return classes;
+        ]);
+
+      if (careerId != 0) {
+        query.andWhere('career.id = :careerId', { careerId });
+      }
+      if (cycleId != 0) {
+        query.andWhere('cycle.id = :cycleId', { cycleId });
+      }
+      if (professorId != 0) {
+        query.andWhere('professor.id = :professorId', { professorId });
+      }
+      return await query.getMany();
     } catch (error) {
-      if (error instanceof HttpException) throw error;
+      if (error instanceof HttpException) {
+        throw error;
+      }
       throw new InternalServerErrorException('¡Ups! Error interno');
     }
   }
