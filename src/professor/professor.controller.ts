@@ -1,11 +1,15 @@
 import {
   Controller,
+  Delete,
   Get,
   HttpStatus,
   Param,
   ParseArrayPipe,
   ParseIntPipe,
+  Put,
   Request,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
@@ -15,6 +19,9 @@ import { ROLE } from 'src/config/constants';
 import { ClassService } from 'src/class/class.service';
 import { ScheduleService } from 'src/schedule/schedule.service';
 import { ProfessorService } from './professor.service';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { fileFilter, renameImage } from 'src/common/helpers';
 
 @ApiTags('Professor routes')
 @Controller('professor')
@@ -55,6 +62,42 @@ export class ProfessorController {
   async getClassesProfessor(@Request() req: any) {
     const data = await this.classService.getClassesProfessor(req.user.sub);
     return { statusCode: HttpStatus.OK, data };
+  }
+
+  // sube foto de portada de la clase
+  @AuthAndRoles(ROLE.professor)
+  @Put('upload-photo-class/:id')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './uploads/classes-photos',
+        filename: renameImage,
+      }),
+      fileFilter: fileFilter,
+    }),
+  )
+  async uploadCoverPhotoClass(
+    @Param('id', ParseIntPipe) id: number,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    const data = await this.classService.uploadCoverPhotoClass(id, file);
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Se subió la foto de la clase',
+      data,
+    };
+  }
+
+  // elimina foto de portada de la clase
+  @AuthAndRoles(ROLE.professor)
+  @Delete('delete-photo-class/:id')
+  async deleteCoverPhotoClass(@Param('id', ParseIntPipe) id: number) {
+    const data = await this.classService.deleteCoverPhotoClass(id);
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Se eliminó la foto de la clase',
+      data: data,
+    };
   }
 
   @AuthAndRoles(ROLE.professor)
