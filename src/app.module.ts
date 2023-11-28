@@ -38,8 +38,12 @@ import { StudentModule } from './student/student.module';
       }),
     }),
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'uploads'),
+      rootPath: join(__dirname, '..', 'uploads/avatars'),
       serveRoot: '/avatar',
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'uploads/classes-photos'),
+      serveRoot: '/class-photo',
     }),
     ConfigModule.forRoot({ isGlobal: true, envFilePath: '.env' }),
     UserModule,
