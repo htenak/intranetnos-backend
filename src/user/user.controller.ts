@@ -23,8 +23,8 @@ import { UserService } from './user.service';
 import { CreateUserDto, UpdateMyUserDto, UpdateUserDto } from './dto';
 import { AuthAndRoles } from 'src/common/decorators';
 import { ROLE } from 'src/config/constants';
-import { fileFilter, renameImage } from './helper';
 import { join } from 'path';
+import { fileFilter, renameImage } from 'src/common/helpers';
 
 @ApiBearerAuth()
 @ApiTags('User routes')
@@ -137,7 +137,7 @@ export class UserController {
   @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
-        destination: './uploads',
+        destination: './uploads/avatars',
         filename: renameImage,
       }),
       fileFilter: fileFilter,
@@ -151,7 +151,7 @@ export class UserController {
     return {
       statusCode: HttpStatus.OK,
       message: 'Se subió tu foto de perfil',
-      data: data,
+      data,
     };
   }
 
@@ -165,7 +165,14 @@ export class UserController {
         message: 'Aún no tienes una foto de perfil',
       });
     }
-    const filePath = join(__dirname, '..', '..', 'uploads', req.user.filename);
+    const filePath = join(
+      __dirname,
+      '..',
+      '..',
+      'uploads',
+      'avatars',
+      req.user.filename,
+    );
     return res.sendFile(filePath);
   }
 

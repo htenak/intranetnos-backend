@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   HttpException,
   Injectable,
@@ -335,8 +336,8 @@ export class UserService {
   // subir foto de perfil (propio)
   async uploadPhoto(id: number, dto: UploadMyPhotoDto) {
     try {
+      if (!dto) throw new BadRequestException('No has enviado ninguna foto');
       const myUser = await this.getUserById(id);
-      if (!dto) throw new NotFoundException('No has enviado ninguna foto');
       return await this.userRepository.save(
         this.userRepository.merge(myUser, dto),
       );
@@ -351,7 +352,14 @@ export class UserService {
     try {
       const myUser = await this.getUserById(id);
       if (!myUser.filename) throw new NotFoundException('Sin foto de perfil');
-      const filePath = join(__dirname, '..', '..', 'uploads', myUser.filename);
+      const filePath = join(
+        __dirname,
+        '..',
+        '..',
+        'uploads',
+        'avatars',
+        myUser.filename,
+      );
       unlinkSync(filePath);
       return await this.userRepository.save(
         this.userRepository.merge(myUser, { filename: null }),
