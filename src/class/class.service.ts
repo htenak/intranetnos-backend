@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   HttpException,
   Inject,
@@ -16,8 +17,11 @@ import {
   CreateStudentClassDto,
   UpdateClassDto,
   UpdateStudentClassDto,
+  UploadCoverPhotoClass,
 } from './dto';
 import { AcademicService } from 'src/academic/academic.service';
+import { join } from 'path';
+import { unlinkSync } from 'fs';
 
 @Injectable()
 export class ClassService {
@@ -343,7 +347,9 @@ export class ClassService {
         .select([
           'class.id',
           'class.denomination',
+          'class.filename',
           'class.status',
+          'class.createdAt',
           'career.name',
           'professor.name',
           'professor.email',
@@ -366,6 +372,45 @@ export class ClassService {
       if (error instanceof HttpException) {
         throw error;
       }
+      throw new InternalServerErrorException('¡Ups! Error interno');
+    }
+  }
+
+  // guarda foto de la clase (professor)
+  async uploadCoverPhotoClass(classId: number, dto: UploadCoverPhotoClass) {
+    try {
+      if (!dto) throw new BadRequestException('No has enviado ninguna foto');
+      const classs = await this.getClassById(classId);
+      // queda pendiente validar si la clase le pertenece al profesor
+      return await this.classRepository.save(
+        this.classRepository.merge(classs, dto),
+      );
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      throw new InternalServerErrorException('¡Ups! Error interno');
+    }
+  }
+
+  // elimina foto de la clase (professor)
+  async deleteCoverPhotoClass(id: number) {
+    try {
+      const classs = await this.getClassById(id);
+      if (!classs.filename) throw new NotFoundException('Clase sin foto');
+      // queda pendiente validar si la clase le pertenece al profesor
+      const filePath = join(
+        __dirname,
+        '..',
+        '..',
+        'uploads',
+        'classes-photos',
+        classs.filename,
+      );
+      unlinkSync(filePath);
+      return await this.classRepository.save(
+        this.classRepository.merge(classs, { filename: null }),
+      );
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
       throw new InternalServerErrorException('¡Ups! Error interno');
     }
   }
