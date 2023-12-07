@@ -115,4 +115,14 @@ export class ProfessorController {
     const data = await this.scheduleService.getSchedulesByClassId(classId);
     return { statusCode: HttpStatus.OK, data };
   }
+
+  @AuthAndRoles(ROLE.professor)
+  @Get('pupils/:params')
+  async getPupils(
+    @Request() req: any,
+    @Param('params', ParseArrayPipe) params: number[],
+  ) {
+    const data = await this.professorService.getPupils(req.user.sub, params);
+    return { statusCode: HttpStatus.OK, data };
+  }
 }

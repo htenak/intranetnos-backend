@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 
 import { Career, Cycle } from 'src/academic/entities';
 import { User } from 'src/user/entities';
+import { ClassService } from 'src/class/class.service';
 
 @Injectable()
 export class ProfessorService {
@@ -42,6 +43,31 @@ export class ProfessorService {
         .leftJoin('user.role', 'role')
         .where('role.name = :roleName', { roleName })
         .getMany();
+    } catch (error) {
+      throw new InternalServerErrorException('¡Ups! Error interno');
+    }
+  }
+
+  // obtiene y filtra todos los alumnos de un profesor
+  async getPupils(professorId: number, parameters: number[]) {
+    const careerId = parameters[0];
+    const cycleId = parameters[1];
+
+    try {
+      const query = this.userRepository
+        .createQueryBuilder('user')
+        .innerJoin('user.studentsClass', 'sc')
+        .innerJoin('sc.classs', 'class')
+        .select(['user', 'sc', 'class.careerId', 'class.cycleId'])
+        .where('class.professorUserId = :professorId', { professorId });
+      // query.andWhere('class.professorUserId = :professorId', { professorId });
+      if (careerId != 0) {
+        query.andWhere('class.careerId = :careerId', { careerId });
+      }
+      if (cycleId != 0) {
+        query.andWhere('class.cycleId = :cycleId', { cycleId });
+      }
+      return await query.getMany();
     } catch (error) {
       throw new InternalServerErrorException('¡Ups! Error interno');
     }
