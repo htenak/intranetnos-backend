@@ -369,9 +369,6 @@ export class ClassService {
       }
       return await query.getMany();
     } catch (error) {
-      if (error instanceof HttpException) {
-        throw error;
-      }
       throw new InternalServerErrorException('¡Ups! Error interno');
     }
   }
