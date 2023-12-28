@@ -18,8 +18,8 @@ export class ActivityType {
   @Column({ type: 'varchar', length: 255 })
   name: string;
 
-  @Column({ type: 'varchar', length: 255 })
-  description: string;
+  @Column({ type: 'bool', default: true })
+  status: boolean;
 
   @Column({ name: 'professor_user_id', nullable: false })
   professorUserId: number;

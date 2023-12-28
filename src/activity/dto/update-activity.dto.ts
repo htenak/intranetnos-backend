@@ -4,6 +4,6 @@ import { IsBoolean, IsOptional } from 'class-validator';
 
 export class UpdateActivityDto extends PartialType(CreateActivityDto) {
   @IsOptional()
-  @IsBoolean({ message: 'El estado de la actividad debe ser nulo' })
+  @IsBoolean({ message: 'El estado de la actividad debe ser boleano' })
   status?: boolean;
 }

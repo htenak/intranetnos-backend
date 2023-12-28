@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   HttpException,
   Injectable,
@@ -147,7 +148,33 @@ export class ActivityService {
     try {
       return await this.activityRepository.find({
         where: { professorUserId },
-        relations: [],
+        relations: [
+          'activityType',
+          'classs.cycle',
+          'classs.course',
+          'classs.career',
+        ],
+      });
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      throw new InternalServerErrorException('¡Ups! Error interno');
+    }
+  }
+
+  // obtiene actividades propias por classId (professor)
+  async getActivitiesProfessorByClassId(
+    professorUserId: number,
+    classId: number,
+  ) {
+    try {
+      return await this.activityRepository.find({
+        where: { professorUserId, classId },
+        relations: [
+          'activityType',
+          'classs.cycle',
+          'classs.course',
+          'classs.career',
+        ],
       });
     } catch (error) {
       if (error instanceof HttpException) throw error;
@@ -160,7 +187,12 @@ export class ActivityService {
     try {
       const activity = await this.activityRepository.findOne({
         where: { id, professorUserId },
-        relations: [],
+        relations: [
+          'activityType',
+          'classs.cycle',
+          'classs.course',
+          'classs.career',
+        ],
       });
       if (!activity) {
         throw new NotFoundException('La actividad no existe');
@@ -190,8 +222,14 @@ export class ActivityService {
         ...dto,
         professorUserId,
       };
-      return await this.activityRepository.save(
+      const savedActivity = await this.activityRepository.save(
         this.activityRepository.create(createdActivity),
+      );
+      if (!savedActivity)
+        throw new BadRequestException('Error al crear actividad');
+      return await this.getActivityProfessorById(
+        professorUserId,
+        savedActivity.id,
       );
     } catch (error) {
       if (error instanceof HttpException) throw error;
@@ -225,7 +263,15 @@ export class ActivityService {
         );
         activityUpdate.classs = newClass;
       }
-      return await this.activityRepository.save(activityUpdate);
+      const updatedActivity = await this.activityRepository.save(
+        activityUpdate,
+      );
+      if (!updatedActivity)
+        throw new BadRequestException('Error al actualizar actividad');
+      return await this.getActivityProfessorById(
+        professorUserId,
+        updatedActivity.id,
+      );
     } catch (error) {
       if (error instanceof HttpException) throw error;
       throw new InternalServerErrorException('¡Ups! Error interno');

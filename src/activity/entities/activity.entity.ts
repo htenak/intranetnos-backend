@@ -42,7 +42,7 @@ export class Activity {
   @Column({ type: 'bool', default: true })
   status: boolean;
 
-  @CreateDateColumn({ name: 'created_at', type: 'timestamp', select: false })
+  @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
   createdAt: Date;
 
   @ManyToOne(() => ActivityType, (activityType) => activityType.activities)

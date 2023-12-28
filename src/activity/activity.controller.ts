@@ -167,6 +167,19 @@ export class ActivityController {
     };
   }
 
+  @AuthAndRoles(ROLE.professor)
+  @Get('professor/activities-class/:classId')
+  async getActivitiesProfessorByClassId(
+    @Request() req: any,
+    @Param('classId', ParseIntPipe) classId: number,
+  ) {
+    const data = await this.activityService.getActivitiesProfessorByClassId(
+      req.user.sub,
+      classId,
+    );
+    return { statusCode: HttpStatus.OK, data };
+  }
+
   // actualiza la actividad propia del profesor
   @AuthAndRoles(ROLE.professor)
   @Put('professor/activities/:id')
