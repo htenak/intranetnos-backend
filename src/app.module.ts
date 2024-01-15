@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ServeStaticModule } from '@nestjs/serve-static';
+import { ScheduleModule } from '@nestjs/schedule';
 import { join } from 'path';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -18,7 +19,7 @@ import { AcademicModule } from './academic/academic.module';
 import { ClassModule } from './class/class.module';
 import { GradeModule } from './grade/grade.module';
 import { ActivityModule } from './activity/activity.module';
-import { ScheduleModule } from './schedule/schedule.module';
+import { ScheduleModule as ScheduleStudentModule } from './schedule/schedule.module';
 import { ProfessorModule } from './professor/professor.module';
 import { StudentModule } from './student/student.module';
 
@@ -46,13 +47,14 @@ import { StudentModule } from './student/student.module';
       serveRoot: '/class-photo',
     }),
     ConfigModule.forRoot({ isGlobal: true, envFilePath: '.env' }),
+    ScheduleModule.forRoot(),
     UserModule,
     AuthModule,
     AcademicModule,
     ClassModule,
     GradeModule,
     ActivityModule,
-    ScheduleModule,
+    ScheduleStudentModule,
     ProfessorModule,
     StudentModule,
   ],

@@ -7,6 +7,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Cron, CronExpression } from '@nestjs/schedule';
+
 import { Activity, ActivityType } from './entities';
 import { Repository } from 'typeorm';
 import {
@@ -26,6 +28,23 @@ export class ActivityService {
     private readonly activityRepository: Repository<Activity>,
     private readonly classService: ClassService,
   ) {}
+
+  // actualiza el estado de las actividades cada una hora
+  @Cron(CronExpression.EVERY_HOUR) // cambiar en producción
+  async handleCron() {
+    // obtiene los registros
+    const records = await this.activityRepository
+      .createQueryBuilder('activity')
+      .where('activity.dueDate <= CURRENT_TIMESTAMP()')
+      .limit(1000)
+      .getMany();
+    // actualiza el estado de los registros
+    const updatedRecords = records.map((record) => ({
+      ...record,
+      status: false,
+    }));
+    await this.activityRepository.save(updatedRecords);
+  }
 
   // obtiene tipos de actividad (admin)
   async getActivityTypes() {
