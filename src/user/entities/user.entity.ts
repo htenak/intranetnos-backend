@@ -13,6 +13,7 @@ import { hash } from 'bcryptjs';
 import { Role } from './role.entity';
 import { Class, StudentClass } from 'src/class/entities';
 import { Activity, ActivityType } from 'src/activity/entities';
+import { ActivityComment } from 'src/activity-comments/entities';
 
 @Entity('users')
 export class User {
@@ -77,6 +78,9 @@ export class User {
   // del estudiante
   @OneToMany(() => StudentClass, (studentClass) => studentClass.student)
   studentsClass: StudentClass[];
+
+  @OneToMany(() => ActivityComment, (activityComment) => activityComment.user)
+  activityComments: ActivityComment[];
 
   @BeforeInsert()
   @BeforeUpdate()

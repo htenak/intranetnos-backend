@@ -22,6 +22,8 @@ import { ActivityModule } from './activity/activity.module';
 import { ScheduleModule as ScheduleStudentModule } from './schedule/schedule.module';
 import { ProfessorModule } from './professor/professor.module';
 import { StudentModule } from './student/student.module';
+import { InstitutionModule } from './institution/institution.module';
+import { ActivityCommentsModule } from './activity-comments/activity-comments.module';
 
 @Module({
   imports: [
@@ -57,6 +59,8 @@ import { StudentModule } from './student/student.module';
     ScheduleStudentModule,
     ProfessorModule,
     StudentModule,
+    InstitutionModule,
+    ActivityCommentsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

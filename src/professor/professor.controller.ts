@@ -125,4 +125,17 @@ export class ProfessorController {
     const data = await this.professorService.getPupils(req.user.sub, params);
     return { statusCode: HttpStatus.OK, data };
   }
+
+  @AuthAndRoles(ROLE.professor)
+  @Get('pupils-class/:classId')
+  async getPupilsByClass(
+    @Request() req: any,
+    @Param('classId', ParseIntPipe) classId: number,
+  ) {
+    const data = await this.professorService.getPupilsByClass(
+      req.user.sub,
+      classId,
+    );
+    return { statusCode: HttpStatus.OK, data };
+  }
 }

@@ -60,7 +60,6 @@ export class ProfessorService {
         .innerJoin('sc.classs', 'class')
         .select(['user', 'sc', 'class.careerId', 'class.cycleId'])
         .where('class.professorUserId = :professorId', { professorId });
-      // query.andWhere('class.professorUserId = :professorId', { professorId });
       if (careerId != 0) {
         query.andWhere('class.careerId = :careerId', { careerId });
       }
@@ -69,6 +68,21 @@ export class ProfessorService {
       }
       return await query.getMany();
     } catch (error) {
+      throw new InternalServerErrorException('¡Ups! Error interno');
+    }
+  }
+
+  async getPupilsByClass(professorId: number, classId: number) {
+    try {
+      return await this.userRepository
+        .createQueryBuilder('user')
+        .innerJoin('user.studentsClass', 'sc')
+        .innerJoin('sc.classs', 'class')
+        .select(['user', 'sc', 'class.careerId', 'class.cycleId'])
+        .where('class.professorUserId = :professorId', { professorId })
+        .andWhere('class.id = :classId', { classId })
+        .getMany();
+    } catch {
       throw new InternalServerErrorException('¡Ups! Error interno');
     }
   }

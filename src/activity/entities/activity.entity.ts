@@ -4,11 +4,14 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { ActivityType } from './activity-type.entity';
 import { Class } from 'src/class/entities';
 import { User } from 'src/user/entities';
+import { ActivityComment } from 'src/activity-comments/entities';
+import { Grade } from 'src/grade/entities';
 
 @Entity('activities')
 export class Activity {
@@ -56,4 +59,13 @@ export class Activity {
   @ManyToOne(() => User, (user) => user.activities)
   @JoinColumn({ name: 'professor_user_id' })
   professor: User;
+
+  @OneToMany(
+    () => ActivityComment,
+    (activityComment) => activityComment.activity,
+  )
+  activityComments: ActivityComment[];
+
+  @OneToMany(() => Grade, (grade) => grade.activity)
+  grades: Grade[];
 }

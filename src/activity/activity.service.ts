@@ -29,8 +29,8 @@ export class ActivityService {
     private readonly classService: ClassService,
   ) {}
 
-  // actualiza el estado de las actividades cada una hora
-  @Cron(CronExpression.EVERY_HOUR) // cambiar en producción
+  // actualiza el estado de las actividades cada media noche
+  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
   async handleCron() {
     // obtiene los registros
     const records = await this.activityRepository
@@ -233,10 +233,15 @@ export class ActivityService {
         professorUserId,
         dto.activityTypeId,
       );
-      await this.classService.getClassProfessorById(
+      const classs = await this.classService.getClassProfessorById(
         professorUserId,
         dto.classId,
       );
+      if (!classs.status) {
+        throw new BadRequestException(
+          'La clase no se encuentra activa, no puedes crear actividades',
+        );
+      }
       const createdActivity = {
         ...dto,
         professorUserId,
@@ -267,6 +272,15 @@ export class ActivityService {
         professorUserId,
         id,
       );
+      const classs = await this.classService.getClassProfessorById(
+        professorUserId,
+        dto.classId,
+      );
+      if (!classs.status) {
+        throw new BadRequestException(
+          'La clase no se encuentra activa, no puedes realizar cambios',
+        );
+      }
       const activityUpdate = this.activityRepository.merge(activityFound, dto);
       if (dto.activityTypeId) {
         const newActivityType = await this.getActivityTypeProfessorById(
@@ -301,6 +315,15 @@ export class ActivityService {
   async deleteActivityProfessor(professorUserId: number, id: number) {
     try {
       const activity = await this.getActivityProfessorById(professorUserId, id);
+      const classs = await this.classService.getClassProfessorById(
+        professorUserId,
+        activity.classId,
+      );
+      if (!classs.status) {
+        throw new BadRequestException(
+          'La clase no se encuentra activa, no puedes eliminar actividades',
+        );
+      }
       return await this.activityRepository.remove(activity);
     } catch (error) {
       if (error instanceof HttpException) throw error;
